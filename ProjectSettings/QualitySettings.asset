@@ -27,6 +27,7 @@ QualitySettings:
     realtimeReflectionProbes: 0
     billboardsFaceCameraPosition: 0
     vSyncCount: 0
+    realtimeGICPUUsage: 25
     lodBias: 0.4
     maximumLODLevel: 0
     streamingMipmapsActive: 0
@@ -40,9 +41,11 @@ QualitySettings:
     asyncUploadBufferSize: 16
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
-    customRenderPipeline: {fileID: 11400000, guid: d0e2fc18fe036412f8223b3b3d9ad574,
+    customRenderPipeline: {fileID: 11400000, guid: 753b16b38b01fb54eb6e95d0766fcee7,
       type: 2}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Android
+    - iPhone
   - serializedVersion: 2
     name: Balanced
     pixelLightCount: 1
@@ -64,6 +67,7 @@ QualitySettings:
     realtimeReflectionProbes: 0
     billboardsFaceCameraPosition: 0
     vSyncCount: 1
+    realtimeGICPUUsage: 25
     lodBias: 1
     maximumLODLevel: 0
     streamingMipmapsActive: 0
@@ -77,9 +81,11 @@ QualitySettings:
     asyncUploadBufferSize: 16
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
-    customRenderPipeline: {fileID: 11400000, guid: e1260c1148f6143b28bae5ace5e9c5d1,
+    customRenderPipeline: {fileID: 11400000, guid: 34eb2b7c09157664086345a9809679af,
       type: 2}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Android
+    - iPhone
   - serializedVersion: 2
     name: High Fidelity
     pixelLightCount: 2
@@ -101,6 +107,7 @@ QualitySettings:
     realtimeReflectionProbes: 1
     billboardsFaceCameraPosition: 1
     vSyncCount: 1
+    realtimeGICPUUsage: 25
     lodBias: 2
     maximumLODLevel: 0
     streamingMipmapsActive: 0
@@ -114,15 +121,17 @@ QualitySettings:
     asyncUploadBufferSize: 16
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
-    customRenderPipeline: {fileID: 11400000, guid: 7b7fd9122c28c4d15b667c7040e3b3fd,
+    customRenderPipeline: {fileID: 11400000, guid: 47758ee242af8b1439f4869860ad48f2,
       type: 2}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Android
+    - iPhone
   m_PerPlatformDefaultQuality:
     Android: 1
     CloudRendering: 2
-    Lumin: 2
     GameCoreScarlett: 2
     GameCoreXboxOne: 2
+    Lumin: 2
     Nintendo Switch: 2
     PS4: 2
     PS5: 2
