@@ -72,3 +72,4 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 /Assets/Behavior Designer
 /Assets/99_ReSources
+/Assets/Plugins/RootMotion
