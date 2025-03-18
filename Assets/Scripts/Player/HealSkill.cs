@@ -28,6 +28,7 @@ namespace PS
         }
         public IEnumerator UseSkillAnimationSycnc()
         {
+            SkillManager.Instance.IsHealing = true;
             //애니메이션을 실행하기전에 총에 고정된 ik를 풀어준다.
             fullBodyBipedIK.solver.leftHandEffector.positionWeight = 0.0f;
             PlayerState previousPlayerState = player.playerState;
@@ -52,6 +53,7 @@ namespace PS
             GameObject healArea = Instantiate(skillPrefab);
             healArea.transform.position = this.transform.position;
             Destroy(healArea, healTime);
+            SkillManager.Instance.IsHealing = false;
             if (previousPlayerState == PlayerState.COMBAT)
             {
                 player.playerState = Player.PlayerState.COMBAT;

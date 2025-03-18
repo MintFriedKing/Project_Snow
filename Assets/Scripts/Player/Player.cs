@@ -311,7 +311,17 @@ namespace PS
                     break;
                 case PlayerState.COMBAT:
                     isCombat = true;
-                    playerAnimationManager.Combat(true);
+                    if (SkillManager.Instance.IsHealing)
+                    {
+                        isCombat = true;
+                        playerAnimationManager.Combat(true);
+                    }
+                    else
+                    {
+                        isCombat = false;
+                        playerAnimationManager.Combat(false);
+
+                    }
                     playerAnimationManager.PlayerAnimator.SetLayerWeight(1, 1f);
                     playerAnimationManager.SetMovementAnimatorValue(playerInputManager.Dir.x, playerInputManager.Dir.z);
                     break;

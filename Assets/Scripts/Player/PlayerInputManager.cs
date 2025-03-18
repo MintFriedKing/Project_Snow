@@ -42,19 +42,23 @@ public class PlayerInputManager : MonoBehaviour
             return;
         }
 
-        if (player != null && player.IsDodge == false && player.IsGround == true && player.PlayerShootManager.gun.isReLoading == false)
+        if (player != null && player.IsDodge == false && player.IsGround == true)
         {
+            AimDownState();
             KeyBordInPut();
             MouseInPut();
         }
-        AimDownState();
+        
     }
     private void FixedUpdate()
     {
         if (Input.GetMouseButton(0))
         {
-            player.SetPlayerState(PlayerState.COMBAT);
-            Shoot();
+            if (player.PlayerShootManager.gun.isReLoading == false)
+            {
+                player.SetPlayerState(PlayerState.COMBAT);
+                Shoot();
+            }
         }
     }
 

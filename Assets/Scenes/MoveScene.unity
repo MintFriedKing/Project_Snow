@@ -168,6 +168,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isShield: 0
   isLaserCahrge: 0
+  isHealing: 0
 --- !u!1 &16888420
 GameObject:
   m_ObjectHideFlags: 0
