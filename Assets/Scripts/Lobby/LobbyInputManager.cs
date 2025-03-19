@@ -16,10 +16,11 @@ namespace PS
                 RaycastHit hit;
                 if (Physics.Raycast(ray, out hit, 100f))
                 {
+                    Debug.Log(hit.transform.name);
                     if(hit.collider.CompareTag("Player"))
                     {
-                        LobbyManager.Instance.IsTuch = true;
-
+                        
+                        LobbyManager.Instance.OnTuched();
                     }
                 }
             }

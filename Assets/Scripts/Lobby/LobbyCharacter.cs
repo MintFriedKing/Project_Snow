@@ -6,9 +6,13 @@ namespace PS
 {
     public class LobbyCharacter : MonoBehaviour
     {
-        public void OnTouched()
-        { 
-            
+        public GameObject spawnEffect;
+  
+        public void CreateSpawnParticle()
+        {
+            GameObject SpawnParticle = Instantiate(spawnEffect);
+            SpawnParticle.transform.position = this.transform.position;
+            SpawnParticle.SetActive(true);
         }
     }
 }
