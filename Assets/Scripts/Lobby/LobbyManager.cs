@@ -88,24 +88,12 @@ namespace PS
             return value;
 
         }
-       //private bool HasParameter(Animator animator, string paramName)
-       // {
-       //     foreach (AnimatorControllerParameter param in animator.parameters)
-       //     {
-       //         if (param.name == paramName)
-       //         {
-       //             return true;
-       //         }
-       //     }
-       //     return false;
-       //}
         public void OnTuched()
         {
              selectValue = GetRandomValue();
         
             Debug.Log(selectValue);
-         
-            //lobbyCharacter.transform.position = lobbyEventInformation[1].teleportTransform.position;
+                  
             lobbyCharacter.gameObject.SetActive(false);
             lobbyCharacter.gameObject.SetActive(true);
             lobbyCharacter.transform.SetParent(lobbyEventInformations[selectValue].teleportTransform);
@@ -115,11 +103,7 @@ namespace PS
             animator.SetTrigger(lobbyEventInformations[selectValue].animaionTriggerName);
             if (selectValue == 0)
             {
-                //if (HasParameter(animator, "IsFirstPosition") == false)
-                //{
-                //    Debug.LogError("애니메이터에 'IsFirstPosition' 파라미터가 존재하지 않습니다!");
-                //}
-
+                
                 animator.SetBool("IsFirstPosition", true);
             }
             else

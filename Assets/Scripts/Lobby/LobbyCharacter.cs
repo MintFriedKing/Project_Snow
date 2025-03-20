@@ -7,7 +7,10 @@ namespace PS
     public class LobbyCharacter : MonoBehaviour
     {
         public GameObject spawnEffect;
-  
+        public void OnEnable()
+        {
+          
+        }
         public void CreateSpawnParticle()
         {
             GameObject SpawnParticle = Instantiate(spawnEffect);
