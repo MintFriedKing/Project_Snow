@@ -2,15 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace PS
 {
     public class LobbyUI : MonoBehaviour
     {
+        #region Canvas
         public Canvas mainCanvas;
         public Canvas combatCanvas;
-        public Button combatButton;
+        public Canvas characterSelectCanvas;
+        public List<Canvas> canvasList;
+        #endregion
+        #region Button
+        public Button combatButton;        // 
+        public Button combatCanvasGoBackButton;
+        public Button characterSelectCanvasGoBackButton;
+        public Button soloPlayButton;
+        public Button soloPlayStartButton;
+        public List<Button> homeButtons; 
+        #endregion
         public Image fadeImage;
         public float startAlphaValue = 1f;
         public float endAlphaValue =0f;
@@ -18,14 +31,55 @@ namespace PS
 
         private void Awake()
         {
-            combatButton.onClick.AddListener(OnCombatButton);
+            Init();
+        }
+        private void Init()
+        {
             mainCanvas.gameObject.SetActive(true);
             combatCanvas.gameObject.SetActive(false);
-        }
+            characterSelectCanvas.gameObject.SetActive(false);
+            soloPlayButton.onClick.AddListener(OnSoloPlayButton);
+            combatButton.onClick.AddListener(OnCombatButton);
+            foreach (Button homeButton in homeButtons)
+            {
+                homeButton.onClick.AddListener(OnHomeButton);
 
-        private void OnCombatButton()
+            }
+            combatCanvasGoBackButton.onClick.AddListener(() => OnGobackButton(combatCanvasGoBackButton, combatCanvas));
+            characterSelectCanvasGoBackButton.onClick.AddListener(() => OnGobackButton(characterSelectCanvasGoBackButton, characterSelectCanvas));
+            soloPlayStartButton.onClick.AddListener(()=> OnNextSceneButton("SoloPlayIngame"));
+        }
+        private void OnHomeButton()
         {
-            mainCanvas.gameObject.SetActive(false);
+            foreach (Button button in homeButtons)
+            {
+                button.GetComponent<ButtonCanvasGroupController>().SetCanvasGroupAlpha();
+            }
+
+            foreach (Canvas canvas in canvasList)
+            {
+                canvas.gameObject.SetActive(false);
+            }
+           
+            mainCanvas.gameObject.SetActive(true);
+      
+        }
+        private void OnGobackButton(Button _goback,Canvas _canvas)
+        {
+            _goback.GetComponent<ButtonCanvasGroupController>().SetCanvasGroupAlpha();
+            _canvas.gameObject.SetActive(false);   
+        }
+        private void OnNextSceneButton(string _sceneName)
+        {
+            NextSceneManager.Instance.nextSceneName = _sceneName;
+            SceneManager.LoadScene("Loading");
+        }
+        private void OnSoloPlayButton()
+        {
+            characterSelectCanvas.gameObject.SetActive(true);
+        }
+        private void OnCombatButton()
+        {       
             combatCanvas.gameObject.SetActive(true);
             StartCoroutine(FadeRoutine(startAlphaValue,endAlphaValue));
         }
@@ -45,7 +99,6 @@ namespace PS
             fadeImage.color = aplhaColor;
             fadeImage.gameObject.SetActive(false);
         }
-
 
     }
 }
