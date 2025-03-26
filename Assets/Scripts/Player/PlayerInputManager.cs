@@ -124,9 +124,11 @@ public class PlayerInputManager : MonoBehaviour
 
     private void Skill()
     {
-        if (Input.GetKeyUp(KeyCode.Q) && SkillManager.Instance.IsLaserCahrge ==false)
+        if (Input.GetKeyUp(KeyCode.Q) && player.IsUseSkill ==false)
         {
            player.playerSkill.UseSkill();
+           player.IsUseSkill = true;
+           StartCoroutine(SkillManager.Instance.CoolDownRoutine(GameManager.Instance.SelectNumber-1));
         }
     }
     #endregion

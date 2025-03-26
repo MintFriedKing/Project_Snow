@@ -47,7 +47,7 @@ namespace PS
             }
             combatCanvasGoBackButton.onClick.AddListener(() => OnGobackButton(combatCanvasGoBackButton, combatCanvas));
             characterSelectCanvasGoBackButton.onClick.AddListener(() => OnGobackButton(characterSelectCanvasGoBackButton, characterSelectCanvas));
-            soloPlayStartButton.onClick.AddListener(()=> OnNextSceneButton("SoloPlayIngame"));
+            soloPlayStartButton.onClick.AddListener(()=> OnNextSceneButton("SoloPlayInGame"));
         }
         private void OnHomeButton()
         {

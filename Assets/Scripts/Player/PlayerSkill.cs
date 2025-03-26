@@ -7,6 +7,7 @@ namespace PS
 {
     public class PlayerSkill : MonoBehaviour
     {
+        public float skillCoolTime;
         public GameObject skillPrefab;
         public Transform  targetTransform;
         public PlayerAnimationManager playerAnimationManager;

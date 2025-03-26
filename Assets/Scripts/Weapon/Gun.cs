@@ -38,6 +38,7 @@ public class Gun : MonoBehaviour
   
     public int MaxCapacity { get { return maxCapacity; } }
     public float Damage { get {return damage; } }
+    public  int CurrentAmmo { get { return currentAmmo; } }
     public enum GunState
     { 
         READY, //사격가능

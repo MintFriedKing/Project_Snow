@@ -42,6 +42,9 @@ namespace PS
         [Header("전투중"), SerializeField]
         private bool isCombat = false;
         private bool isCanBeHit;
+
+        [Header("UseSkill")]
+        private bool isUseSkill; 
         //private float dodgeTimer;
         // [SerializeField]
         //private AnimationCurve dodgeCurve;
@@ -67,6 +70,7 @@ namespace PS
         public bool IsGround { get { return isGround; } set { isGround = value; } }
         public bool IsDash { get { return isDash; } set { isDash = value; } }
         public bool IsFire { get { return isFire; } set { isFire = value; } }
+        public bool IsUseSkill { get { return isUseSkill; } set { isUseSkill = value; } }
         public Vector3 FinalDirection { get { return finalDirection; } set { finalDirection = value; } }
         public CameraController CameraController { get { return cameraController; } set { cameraController = value; } }
         public Transform CameraFollowTarget { get { return cameraFollowTarget; } }
@@ -111,6 +115,7 @@ namespace PS
         }
         public void Init()
         {
+            isUseSkill = false; 
             isCanBeHit = true;
             Instance = this;
             //playerInputManager = this.GetComponent<PlayerInputManager>();
@@ -298,36 +303,31 @@ namespace PS
         }
         private void UpdatePlayerState()
         {
-           
             switch (playerState)
             {
                 case PlayerState.IDLE:
                     isCombat = false;
                     playerAnimationManager.Combat(false);
                     playerAnimationManager.PlayerAnimator.SetLayerWeight(1, 1f);
-
-                    //Mathf.Clamp01(value)  -> 주어진 값을 0 ~ 1로 제한  
+                    //Mathf.Clamp01(value)  -> 주어진 값을 0 ~ 1로 제한
                     playerAnimationManager.SetMovementAnimatorValue(Mathf.Clamp01(Mathf.Abs(playerInputManager.Dir.x)), Mathf.Clamp01(Mathf.Abs(playerInputManager.Dir.z)));
                     break;
                 case PlayerState.COMBAT:
-                    isCombat = true;
-                    if (SkillManager.Instance.IsHealing)
-                    {
-                        isCombat = true;
-                        playerAnimationManager.Combat(true);
-                    }
-                    else
+                    if (SkillManager.Instance.IsHealing == true) //힐스킬 시전중
                     {
                         isCombat = false;
                         playerAnimationManager.Combat(false);
-
+                    }
+                    else
+                    {
+                        isCombat = true;
+                        playerAnimationManager.Combat(true);
                     }
                     playerAnimationManager.PlayerAnimator.SetLayerWeight(1, 1f);
                     playerAnimationManager.SetMovementAnimatorValue(playerInputManager.Dir.x, playerInputManager.Dir.z);
                     break;
                 case PlayerState.DIE:
                     break;
-
             }
         }
         //public IEnumerator Dodge()

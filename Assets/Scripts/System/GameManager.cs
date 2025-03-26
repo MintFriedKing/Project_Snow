@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PS
 {
@@ -10,10 +11,12 @@ namespace PS
     public class PlayerInformation
     {
         public Player player;
+        public Sprite  playerIcon; 
         public PlayerSkill skill;
+        public Sprite skillIcon;
         public float hp; //체력 
         public float ammo; // 총알수 
-        public float skillCoolTime;
+        public float skillCoolTime;//스킬 쿨타임
 
     } 
     public class GameManager : MonoBehaviour
@@ -48,32 +51,39 @@ namespace PS
         public Transform PlayerTransform { get { return playerTransform; } }
         public PlayerInputManager PlayerInputManager { get { return playerInputManager; } set { playerInputManager = value; } }
         private void Awake()
-        {    
+        {
+            Instance = this;                       
             CharacterInit();
-            players[selectNumber -1].player.gameObject.SetActive(true);
-            currentPlayer = players[selectNumber - 1].player;
-            playerInputManager.player = currentPlayer;
-            Instance = this;
+            for (int i = 0; i < players.Count; i++)
+            {
+                SkillManager.Instance.SkillCoolTimes[i] = players[i].skillCoolTime;
+            }
         }
         public void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+
+            if (SkillManager.Instance.IsHealing == false &&
+                 SkillManager.Instance.IsLaserCahrge == false 
+                 && SkillManager.Instance.IsShield ==false)
             {
-                previousSlectNumber = selectNumber;
-                selectNumber = 1;
-                CharacterSelect(selectNumber);
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                previousSlectNumber = selectNumber;
-                selectNumber = 2;
-                CharacterSelect(selectNumber);
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                previousSlectNumber = selectNumber;
-                selectNumber = 3;
-                CharacterSelect(selectNumber);
+                if (Input.GetKeyDown(KeyCode.Alpha1))
+                {
+                    previousSlectNumber = selectNumber;
+                    selectNumber = 1;
+                    CharacterSelect(selectNumber);
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha2))
+                {
+                    previousSlectNumber = selectNumber;
+                    selectNumber = 2;
+                    CharacterSelect(selectNumber);
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha3))
+                {
+                    previousSlectNumber = selectNumber;
+                    selectNumber = 3;
+                    CharacterSelect(selectNumber);
+                }
             }
         }
         public void CharacterInit()
@@ -85,16 +95,19 @@ namespace PS
                 PlayerInformation.hp = PlayerInformation.player.PlayerHealth.Maxhealth; // hp 
                 PlayerInformation.ammo = PlayerInformation.player.PlayerShootManager.gun.MaxCapacity; // 총알
                 PlayerInformation.skill = PlayerInformation.player.playerSkill;
+                PlayerInformation.skillCoolTime = PlayerInformation.player.playerSkill.skillCoolTime;
             }
-            //previousTransform = players[selectNumber - 1].player.gameObject.transform;
-            //CharacterSelect(selectNumber, previousTransform);
+         
             CharacterSelect(selectNumber);
+            players[selectNumber - 1].player.gameObject.SetActive(true);
+            currentPlayer = players[selectNumber - 1].player;
+            playerInputManager.player = currentPlayer;
         }
         private void CharacterSwap(int _selectNumber)
         {
-           
+         
             if (previousSlectNumber == _selectNumber) // 이전 과 지금이 같은가? 
-            {
+            {        
                 return;             
             }
             else
@@ -129,9 +142,12 @@ namespace PS
                     }
                     //players[_selectNumber - 1].player.PlayerAnimationManager.InAir(false);
                 }
+                
 
             }
-         
+            UIManager.Instance.playerStatusIcon.sprite = players[selectNumber - 1].playerIcon;
+            UIManager.Instance.ChangeCharacterList();
+            UIManager.Instance.ChangeSkillSprite();
         }
         private void CharacterSelect(int _SelectNumber)
         {

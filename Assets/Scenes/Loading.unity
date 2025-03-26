@@ -549,6 +549,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 09a52fddd6b8e804985786fcb83d4116, type: 3}
   - {fileID: 21300000, guid: 341bb73adc320b9448d882ad5674f349, type: 3}
   - {fileID: 21300000, guid: c25abd2592d8fca449e1a7de93eb0fc3, type: 3}
+  fakeLodingTime: 5
 --- !u!1 &1799960258
 GameObject:
   m_ObjectHideFlags: 0
