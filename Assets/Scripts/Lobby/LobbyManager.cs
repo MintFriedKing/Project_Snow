@@ -35,13 +35,22 @@ namespace PS
 
         private void Awake()
         {
-            Instance = this;
+            if (Instance == null)
+            {
+                Instance = this;
+              
+            }
+    
             isTuch = true;
             lobbyCharacter.transform.position = lobbyEventInformations[0].teleportTransform.position;
             lobbyCharacter.transform.rotation = lobbyEventInformations[0].teleportTransform.rotation;
             animator.SetBool("IsFirstPosition",true);
          
             timer = animationChangeTime;
+        }
+        private void Start()
+        {
+            Debug.Log("Current Time.timeScale: " + Time.timeScale);
         }
         private void Update()
         {
@@ -51,10 +60,6 @@ namespace PS
                 ChangeAnimation();
             }
 
-            //if (Time.time >= animationChangeTime && selectValue == 0)
-            //{
-            //    SetNextAnimaion();
-            //}
         }
      
         public void ChangeAnimation()

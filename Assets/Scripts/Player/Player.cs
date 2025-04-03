@@ -42,7 +42,10 @@ namespace PS
         [Header("전투중"), SerializeField]
         private bool isCombat = false;
         private bool isCanBeHit;
-
+        [Header("stemina"), SerializeField]
+        private float maxStemina;
+        [SerializeField]
+        private float currentStemina;
         [Header("UseSkill")]
         private bool isUseSkill; 
         //private float dodgeTimer;
@@ -74,6 +77,9 @@ namespace PS
         public Vector3 FinalDirection { get { return finalDirection; } set { finalDirection = value; } }
         public CameraController CameraController { get { return cameraController; } set { cameraController = value; } }
         public Transform CameraFollowTarget { get { return cameraFollowTarget; } }
+        public float MaxStemina { get { return maxStemina; } set { maxStemina = value; } }
+        public float CurrentStemina { get { return currentStemina; } set { currentStemina = value; } }
+
         public PlayerSkill playerSkill;
         public LayerMask groundMask;
         public FullBodyBipedIK fullBodyBipedIK;
@@ -107,6 +113,10 @@ namespace PS
         }
         private void Update()
         {
+            if (currentStemina < 0)
+            {
+                DashOut();
+            }
             UpdatePlayerState();
         }
         private void FixedUpdate() //물리 업데이트가 필요할때 많이 쓰는듯? 
@@ -139,7 +149,7 @@ namespace PS
             //    GameObject newAimTarget = new GameObject("AimTarget");
             //    aimTarget = newAimTarget.transform;
             //}
-          
+            currentStemina = maxStemina;
         }
 
         //private void PlayerRotation()
@@ -347,12 +357,12 @@ namespace PS
         public void DashIn()
         {
             SetPlayerState(PlayerState.IDLE);
+            DealyDash();
+            //Vector3 desiredDirection = cameraController.YRotation * playerInputManager.Dir;
 
-            Vector3 desiredDirection = cameraController.YRotation * playerInputManager.Dir;
+            //delayedForceToApply = desiredDirection;
 
-            delayedForceToApply = desiredDirection;
-
-            Invoke(nameof(DealyDash), 0.025f); // 파악하고 튀어나가는 느낌을 극대화 할려고 딜레이줌
+            //Invoke(nameof(DealyDash), 0.025f); // 파악하고 튀어나가는 느낌을 극대화 할려고 딜레이줌
 
             //Invoke(nameof(DashOut), dashDurationTime); //LeftShift를 땠을경우로 조건이 바뀜 
 
@@ -366,17 +376,17 @@ namespace PS
             else
             {
                 isDash = true;
-                playerAnimationManager.Dash();
-                plyaerRigidbody.AddForce(delayedForceToApply * dashSpeed, ForceMode.Impulse);
-                speed *= 1.5f;
+                playerAnimationManager.Dash(isDash);
+                //plyaerRigidbody.AddForce(delayedForceToApply * dashSpeed, ForceMode.Impulse);
+                speed *= 2f;
             }
 
         }
         public void DashOut()
         {
-            speed /= 1.5f;
+            speed /= 2f;
             isDash = false;
-
+            playerAnimationManager.Dash(isDash);
         }
         #endregion
 

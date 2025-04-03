@@ -1,8 +1,12 @@
-using BehaviorDesigner.Runtime.Tasks.Unity.UnityCharacterController;
+ï»¿using BehaviorDesigner.Runtime.Tasks.Unity.UnityCharacterController;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.UI;
 
 namespace PS
@@ -14,9 +18,10 @@ namespace PS
         public Sprite  playerIcon; 
         public PlayerSkill skill;
         public Sprite skillIcon;
-        public float hp; //Ã¼·Â 
-        public float ammo; // ÃÑ¾Ë¼ö 
-        public float skillCoolTime;//½ºÅ³ ÄğÅ¸ÀÓ
+        public float hp; //ì²´ë ¥ 
+        public float ammo; // ì´ì•Œìˆ˜ 
+        public float skillCoolTime;//ìŠ¤í‚¬ ì¿¨íƒ€ì„
+        public float stamina;
 
     } 
     public class GameManager : MonoBehaviour
@@ -24,10 +29,11 @@ namespace PS
         [SerializeField ,Header("player")]
         private Transform playerTransform;
         [SerializeField]
+        private float timeLimit;
+        [SerializeField]
         public List<PlayerInformation> players;
         public bool isChange;
         public ParticleSystem swapPaticleSystem;
-
         private Player currentPlayer;
         [SerializeField]
         private PlayerInputManager playerInputManager;
@@ -36,49 +42,90 @@ namespace PS
         [SerializeField]
         private Transform cameraFollowTransform;
         [SerializeField]
-        private int selectNumber;               // ÇöÀç ¼±ÅÃ ¹øÈ£ 
-        private int previousSlectNumber;     // ÀÌÀü ¼±ÅÃ ¹øÈ£ 
-        private Transform previousTransform;  // ÀÌÀü Ä³¸¯ÅÍ À§Ä¡
-        private Transform currentTransform;   // ÇöÀç Ä³¸¯ÅÍ À§Ä¡
+        private int selectNumber;               // í˜„ì¬ ì„ íƒ ë²ˆí˜¸ 
+        private int previousSlectNumber;     // ì´ì „ ì„ íƒ ë²ˆí˜¸ 
+        private Transform previousTransform;  // ì´ì „ ìºë¦­í„° ìœ„ì¹˜
+        private Transform currentTransform;   // í˜„ì¬ ìºë¦­í„° ìœ„ì¹˜
         private Quaternion previousRotation;
         private Quaternion currentRotation;
+        [SerializeField]
+        private LineRenderer linePath;   //ê¸¸ì•ˆë‚´ ì„ 
+        [SerializeField]
+        private NavMeshAgent startPathPointnavMeshAgent; //ì•ˆë‚´ ì‹œì‘ ìœ„ì¹˜
+        [SerializeField]
+        private NavMeshAgent endPathPointnavMeshAgent;
+        [SerializeField]
+        private Transform endPathPointTransform;
+
+        [SerializeField]
+        private float pathHeightOffset = 1.25f; // ë¼ì¸ ëœë”ëŸ¬ ë†’ì´ ê°’
+        [SerializeField]
+        private float pathUpdateSpeed = 0.25f;// ê¸¸ì•ˆë‚´ ì„  ì—…ë°ì´íŠ¸ ì£¼ê¸°                                    
+        //private NavMeshTriangulation triangulation; // ë„¤ë¸Œë§¤ì‰¬ ì§€í˜•ë°ì´í„°ë¥¼ ê°€ì ¸ì˜¬ ë³€ìˆ˜ 
+
 
         public static GameManager Instance;
-
+        public List<Transform> pathTransforms; 
+        public float currentGameTime;
+        private Coroutine drawPathCoroutine;
         public int SelectNumber { get { return selectNumber; } }
         public Player CurrentPlayer { get { return currentPlayer; } }
         public Transform CameraFollowTransform { get { return cameraFollowTransform; } }
         public Transform PlayerTransform { get { return playerTransform; } }
         public PlayerInputManager PlayerInputManager { get { return playerInputManager; } set { playerInputManager = value; } }
+        public float TimeLimit { get { return timeLimit; } }
         private void Awake()
         {
-            Instance = this;                       
+            Instance = this;
+            currentGameTime = TimeLimit * 60f;
             CharacterInit();
             for (int i = 0; i < players.Count; i++)
             {
                 SkillManager.Instance.SkillCoolTimes[i] = players[i].skillCoolTime;
             }
+          
+           
+
+        }
+        private void Start()
+        {
+            InvokeRepeating(nameof(DrawPath),0f,pathUpdateSpeed);
+           
         }
         public void Update()
         {
+           
+
+            if (currentGameTime > 0)
+            {
+                currentGameTime -= Time.deltaTime;
+            }
+            if (currentGameTime < 0)
+            {
+                Time.timeScale = 0;
+            }
 
             if (SkillManager.Instance.IsHealing == false &&
                  SkillManager.Instance.IsLaserCahrge == false 
                  && SkillManager.Instance.IsShield ==false)
             {
-                if (Input.GetKeyDown(KeyCode.Alpha1))
+                if (Input.GetKeyDown(KeyCode.Alpha1) 
+                    && GameManager.Instance.players[0].player.playerState != Player.PlayerState.DIE)
                 {
+                   
                     previousSlectNumber = selectNumber;
                     selectNumber = 1;
                     CharacterSelect(selectNumber);
                 }
-                else if (Input.GetKeyDown(KeyCode.Alpha2))
+                else if (Input.GetKeyDown(KeyCode.Alpha2)
+                    && GameManager.Instance.players[1].player.playerState != Player.PlayerState.DIE)
                 {
                     previousSlectNumber = selectNumber;
                     selectNumber = 2;
                     CharacterSelect(selectNumber);
                 }
-                else if (Input.GetKeyDown(KeyCode.Alpha3))
+                else if (Input.GetKeyDown(KeyCode.Alpha3)
+                    && GameManager.Instance.players[2].player.playerState != Player.PlayerState.DIE)
                 {
                     previousSlectNumber = selectNumber;
                     selectNumber = 3;
@@ -91,11 +138,12 @@ namespace PS
             previousSlectNumber = selectNumber;
             foreach (var PlayerInformation in players)
             {
-                PlayerInformation.player.Init(); // °¢ Ä³¸¯ÅÍ¸¦ ÃÊ±âÈ­
+                PlayerInformation.player.Init(); // ê° ìºë¦­í„°ë¥¼ ì´ˆê¸°í™”
                 PlayerInformation.hp = PlayerInformation.player.PlayerHealth.Maxhealth; // hp 
-                PlayerInformation.ammo = PlayerInformation.player.PlayerShootManager.gun.MaxCapacity; // ÃÑ¾Ë
+                PlayerInformation.ammo = PlayerInformation.player.PlayerShootManager.gun.MaxCapacity; // ì´ì•Œ
                 PlayerInformation.skill = PlayerInformation.player.playerSkill;
                 PlayerInformation.skillCoolTime = PlayerInformation.player.playerSkill.skillCoolTime;
+                PlayerInformation.stamina = PlayerInformation.player.MaxStemina; //ë‹¬ë¦´ë•Œ ì“°ëŠ” ìŠ¤í…Œë¯¸ë‚˜ 
             }
          
             CharacterSelect(selectNumber);
@@ -106,14 +154,14 @@ namespace PS
         private void CharacterSwap(int _selectNumber)
         {
          
-            if (previousSlectNumber == _selectNumber) // ÀÌÀü °ú Áö±İÀÌ °°Àº°¡? 
+            if (previousSlectNumber == _selectNumber) // ì´ì „ ê³¼ ì§€ê¸ˆì´ ê°™ì€ê°€? 
             {        
                 return;             
             }
             else
             {
-                previousTransform = players[previousSlectNumber - 1].player.transform; //ÀÌÀü Ä³¸¯ÅÍÀÇ À§Ä¡¸¦ ´ëÀÔÇÏ°í
-                currentTransform = previousTransform; //ÇöÀç¿¡ Àû¿ë
+                previousTransform = players[previousSlectNumber - 1].player.transform; //ì´ì „ ìºë¦­í„°ì˜ ìœ„ì¹˜ë¥¼ ëŒ€ì…í•˜ê³ 
+                currentTransform = previousTransform; //í˜„ì¬ì— ì ìš©
          
                 previousRotation = players[previousSlectNumber - 1].player.transform.rotation;
                 currentRotation = previousRotation;
@@ -121,17 +169,17 @@ namespace PS
                 currentPlayer = players[_selectNumber - 1].player;
            
 
-                //1.´Ù¸£´Ù¸é ±³Ã¼ÇØ¾ßÇÑ´Ù.
+                //1.ë‹¤ë¥´ë‹¤ë©´ êµì²´í•´ì•¼í•œë‹¤.
                 for (int i = 0; i < players.Count; i++) //
                 {
-                    if (i == (_selectNumber - 1)) //¼±ÅÃÇÑ Ä³¸¯ÅÍÀÇ °æ¿ì 
+                    if (i == (_selectNumber - 1)) //ì„ íƒí•œ ìºë¦­í„°ì˜ ê²½ìš° 
                     {
-                        //cameraController.cameraTarget = players[_selectNumber - 1].cameraTargetTransform;//Ä«¸Ş¶ó ¸ñÇ¥ ±³Ã¼ÇØÁÖ°í                                                                                             
+                        //cameraController.cameraTarget = players[_selectNumber - 1].cameraTargetTransform;//ì¹´ë©”ë¼ ëª©í‘œ êµì²´í•´ì£¼ê³                                                                                              
                         playerInputManager.player = currentPlayer;
                        // cameraController.playerInputManager = players[_selectNumber - 1].player.PlayerInputManager;
-                        players[_selectNumber - 1].player.gameObject.transform.position = currentTransform.position;  //À§Ä¡¸¦ Á¤ÇÏ°í
-                        players[_selectNumber - 1].player.transform.rotation = currentRotation;             //È¸ÀüÀ» Á¤ÇÏ°í      
-                        players[_selectNumber - 1].player.gameObject.SetActive(true); //È°¼ºÈ­ 
+                        players[_selectNumber - 1].player.gameObject.transform.position = currentTransform.position;  //ìœ„ì¹˜ë¥¼ ì •í•˜ê³ 
+                        players[_selectNumber - 1].player.transform.rotation = currentRotation;             //íšŒì „ì„ ì •í•˜ê³       
+                        players[_selectNumber - 1].player.gameObject.SetActive(true); //í™œì„±í™” 
                         swapPaticleSystem.Play();
                         //players[_selectNumber - 1].player.PlayerAnimationManager.SetMovementAnimatorValue(Mathf.Clamp01(Mathf.Abs(playerInputManager.Dir.x)), Mathf.Clamp01(Mathf.Abs(playerInputManager.Dir.z)));
 
@@ -142,16 +190,126 @@ namespace PS
                     }
                     //players[_selectNumber - 1].player.PlayerAnimationManager.InAir(false);
                 }
-                
-
             }
-            UIManager.Instance.playerStatusIcon.sprite = players[selectNumber - 1].playerIcon;
-            UIManager.Instance.ChangeCharacterList();
-            UIManager.Instance.ChangeSkillSprite();
+
+           
+                UIManager.Instance.playerStatusIcon.sprite = players[selectNumber - 1].playerIcon;
+                UIManager.Instance.ChangeCharacterList();
+                UIManager.Instance.ChangeSkillSprite();
+                UIManager.Instance.InitStatusBar();
+            
+
         }
         private void CharacterSelect(int _SelectNumber)
         {
             CharacterSwap(_SelectNumber);
+        }
+        public void DieCharacterSwap()
+        {
+            if (OnCheckAllDie() == false)
+            {
+                for (int i = 0; i < players.Count; i++)
+                {
+                    if (players[i].player.playerState != Player.PlayerState.DIE)
+                    {
+                        selectNumber = i + 1;
+                        CharacterSelect(i + 1);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                UIManager.Instance.mainCanvas.gameObject.SetActive(false);
+                UIManager.Instance.defeatCanvas.gameObject.SetActive(true);
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None; // ì»¤ì„œ ì ê¸ˆ í•´ì œ
+
+            }
+        }
+        public bool OnCheckAllDie()
+        {
+            for (int i = 0; i < players.Count; i++)
+            {
+                if (players[i].player.playerState != Player.PlayerState.DIE)
+                {
+                    return false;
+                   
+                }
+            }
+
+            return true;
+        }
+
+        private IEnumerator DrawPathRoutine()
+        {
+            WaitForSeconds wait = new WaitForSeconds(pathUpdateSpeed);
+
+            NavMeshPath path = new NavMeshPath();
+
+            while (pathTransforms != null)
+            {
+                if (NavMesh.CalculatePath(pathTransforms[0].position, pathTransforms[2].position
+                                                    , NavMesh.AllAreas, path))
+                {
+                    linePath.positionCount = path.corners.Length;
+
+                    for (int i = 0; i < path.corners.Length; i++)
+                    {
+                        linePath.SetPosition(i, path.corners[i] + Vector3.up * pathHeightOffset);
+                    }
+                }
+                else 
+                {
+                    Debug.Log($"Unable to calculate a path on the navmesh betwen {pathTransforms[0].position} and {pathTransforms[2].position}");
+                }
+                yield return wait;
+            }     
+        }
+        private void DrawPath()
+        {
+            if (startPathPointnavMeshAgent == null || endPathPointTransform == null || linePath == null)
+            {
+                Debug.Log("nullì˜¤ë¥˜");
+                return;
+            }
+            Debug.Log("nullì˜¤ë¥˜ ì•„ë‹˜");
+
+            NavMeshHit hit;
+         
+
+            // End ìœ„ì¹˜ í™•ì¸ ë° ë³´ì •
+            if (NavMesh.SamplePosition(endPathPointTransform.position, out hit, 1.0f, NavMesh.AllAreas))
+            {
+                endPathPointTransform.position = hit.position;
+                Debug.Log($"End ìœ„ì¹˜ ë³´ì • ì™„ë£Œ! ìƒˆë¡œìš´ ìœ„ì¹˜: {hit.position}");
+            }
+            else
+            {
+                Debug.LogError("End ìœ„ì¹˜ê°€ NavMesh ìœ„ì— ì—†ìŒ!");
+            }
+
+            NavMeshPath path = new NavMeshPath();
+            if (NavMesh.CalculatePath(startPathPointnavMeshAgent.transform.position, 
+                endPathPointTransform.position, NavMesh.AllAreas, path))
+            {
+                linePath.positionCount = path.corners.Length;
+                Debug.Log(linePath.positionCount);
+
+                for (int i = 0; i < path.corners.Length; i++)
+                {
+                    linePath.SetPosition(i, path.corners[i] + Vector3.up * pathHeightOffset);
+                
+                }
+               
+            }
+            else
+            {
+                Debug.LogError("NavMesh.CalculatePath() ì‹¤íŒ¨! start, end ìœ„ì¹˜ í™•ì¸ í•„ìš”");
+                Debug.LogError($"Start Position: {startPathPointnavMeshAgent.transform.position}");
+                Debug.LogError($"End Position: {endPathPointTransform.position}");
+
+            }
         }
 
     }

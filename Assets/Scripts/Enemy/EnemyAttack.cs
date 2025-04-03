@@ -49,12 +49,21 @@ public class EnemyAttack : BehaviorDesigner.Runtime.Tasks.Action
                 rangeEnemy.Attack();
                 
             }
+            return TaskStatus.Running;
         }
-        else if (CheckDistance() == false) 
-        {     
+        else 
+        {
+            if (enemy != null)
+            {
+                enemy.NavMeshAgent.isStopped = false;
+            }
+            else
+            {
+                rangeEnemy.NavMeshAgent.isStopped = false;
+            }
             return TaskStatus.Success;
         }
-        return TaskStatus.Running;
+       
     }
     public bool CheckDistance()
     {

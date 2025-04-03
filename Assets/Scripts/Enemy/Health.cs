@@ -1,3 +1,4 @@
+using BehaviorDesigner.Runtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,12 +36,21 @@ public class Health : MonoBehaviour
 
     public virtual void Die()
     {
-        ragDoll.EnableRagdoll(); //레그돌 발동 
-        healthBar.gameObject.SetActive(false); //hp바 비활성화
+        //ragDoll.EnableRagdoll(); //레그돌 발동 
+        BehaviorTree behaivortree = this.GetComponent<BehaviorTree>();
+        behaivortree.enabled = false;
         enemy.enemyState = EnemyState.Die;
+        enemy.EnemyAnimationManger.Die();
+        float animationTime = enemy.EnemyAnimationManger.Animator.GetCurrentAnimatorStateInfo(0).length;
+        Destroy(enemy.gameObject, animationTime); 
+       
     }
     public virtual void TakeDamage(float _amount ,Vector3 _direction)
     {
+        if (enemy.enemyState == EnemyState.Idle)
+        {
+            enemy.enemyState = EnemyState.Combat;
+        }
         currentHealth -= _amount;
         healthBar.SetHealthBar(currentHealth / maxhealth);
         if (currentHealth <= 0.0f)

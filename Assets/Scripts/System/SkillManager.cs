@@ -15,6 +15,7 @@ namespace PS
         private bool isHealing;
         [SerializeField]
         private float[] skillCoolTimes = new float[3];
+     
         public static SkillManager Instance;
         public float currnetCircleSliderValue;
         public float[] SkillCoolTimes { get { return skillCoolTimes; } set { skillCoolTimes = value; } }

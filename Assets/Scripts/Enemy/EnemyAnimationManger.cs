@@ -8,14 +8,7 @@ public class EnemyAnimationManger : MonoBehaviour
     [SerializeField]
     protected Animator animator;   
     public Animator Animator { get { return animator; } set { animator = value; } }
-    //private void Awake()
-    //{
-    //    Init();
-    //}
-    //protected virtual  void Init()
-    //{
-    //    animator = this.GetComponent<Animator>();
-    //}
+   
     public virtual void Roar()
     {
         animator.SetTrigger("Roar");
@@ -28,5 +21,8 @@ public class EnemyAnimationManger : MonoBehaviour
     {
         animator.SetTrigger("Attack");
     }
-   
+    public virtual void Die()
+    {
+        animator.SetTrigger("Die");
+    }
 }

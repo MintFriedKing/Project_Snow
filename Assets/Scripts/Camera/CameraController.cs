@@ -51,7 +51,7 @@ namespace PS
         }
         private void Update()
         {
-            SetCameraAimDownSight();
+           // SetCameraAimDownSight();
             SetCameraState();
         }
         private void LateUpdate()
@@ -107,15 +107,15 @@ namespace PS
             float speed = cameraFollowSpeed * Time.deltaTime;
             desiredPosition = cameraTarget.position - targetRotation * offset + Vector3.up * height;
             this.transform.rotation = targetRotation;
-            if (GameManager.Instance.CurrentPlayer.PlayerShootManager.isADS == true)
-            {
-                Vector3 ADS  = adsPosition.transform.position;
-                transform.position = Vector3.MoveTowards(this.transform.position, ADS, speed);
-            }
-            else
-            {
+            //if (GameManager.Instance.CurrentPlayer.PlayerShootManager.isADS == true)
+           // {
+             //   Vector3 ADS  = adsPosition.transform.position;
+               // transform.position = Vector3.MoveTowards(this.transform.position, ADS, speed);
+           // }
+            //else
+            //{
                 transform.position = Vector3.MoveTowards(transform.position, desiredPosition, speed);
-            }
+            //}
 
         }
         private void SetCameraAimDownSight()

@@ -22,19 +22,22 @@ namespace PS
         public Button characterSelectCanvasGoBackButton;
         public Button soloPlayButton;
         public Button soloPlayStartButton;
-        public List<Button> homeButtons; 
+        public Button chatOpenButton;
+        public List<Button> homeButtons;
         #endregion
         public Image fadeImage;
         public float startAlphaValue = 1f;
         public float endAlphaValue =0f;
         public float fadeTime;
-
+        public GameObject chatPanel;
+       
         private void Awake()
         {
             Init();
         }
         private void Init()
         {
+            
             mainCanvas.gameObject.SetActive(true);
             combatCanvas.gameObject.SetActive(false);
             characterSelectCanvas.gameObject.SetActive(false);
@@ -48,6 +51,7 @@ namespace PS
             combatCanvasGoBackButton.onClick.AddListener(() => OnGobackButton(combatCanvasGoBackButton, combatCanvas));
             characterSelectCanvasGoBackButton.onClick.AddListener(() => OnGobackButton(characterSelectCanvasGoBackButton, characterSelectCanvas));
             soloPlayStartButton.onClick.AddListener(()=> OnNextSceneButton("SoloPlayInGame"));
+            chatOpenButton.onClick.AddListener(OnChatPanel);
         }
         private void OnHomeButton()
         {
@@ -99,6 +103,16 @@ namespace PS
             fadeImage.color = aplhaColor;
             fadeImage.gameObject.SetActive(false);
         }
-
+        private void OnChatPanel()
+        {
+            if (chatPanel.gameObject.activeSelf == true)
+            {
+                chatPanel.gameObject.SetActive(false);
+            }
+            else 
+            {
+                chatPanel.gameObject.SetActive(true);
+            }
+        }
     }
 }

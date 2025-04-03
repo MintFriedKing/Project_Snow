@@ -25,10 +25,9 @@ public class FollowPlayer : Action
         {
             return TaskStatus.Success;
         }
-        else if (enemy != null && enemy.enemyState == Enemy.EnemyState.Die ||rangeEnemy != null &&rangeEnemy.enemyState ==Enemy.EnemyState.Die)
+        else if (enemy != null && enemy.enemyState == Enemy.EnemyState.Die ||rangeEnemy != null &&rangeEnemy.enemyState == Enemy.EnemyState.Die)
         {
                 enemy.IsMove = false;
-              
                 return TaskStatus.Failure;
                       
         }
@@ -44,14 +43,15 @@ public class FollowPlayer : Action
         {
             enemy.IsMove = true;
             enemy.EnemyAnimationManger.Movement(true);
-            enemy.NavMeshAgent.SetDestination(GameManager.Instance.PlayerTransform.position);
+            enemy.NavMeshAgent.SetDestination(GameManager.Instance.PlayerInputManager.transform.position);
+            Debug.Log(GameManager.Instance.PlayerInputManager.transform.position);
             enemy.NavMeshAgent.speed = followspeed;
         }
         else if (rangeEnemy != null)
         {
             //rangeEnemy.NavMeshAgent.velocity = Vector3.zero;
             rangeEnemy.NavMeshAgent.isStopped = false;
-            rangeEnemy.transform.LookAt(GameManager.Instance.PlayerTransform.position);
+            rangeEnemy.transform.LookAt(GameManager.Instance.PlayerInputManager.transform.position);
             rangeEnemy.LookAtIK.solver.target = GameManager.Instance.CameraFollowTransform;
             rangeEnemy.LookAtIK.solver.Update();
             rangeEnemy.AimIK.solver.IKPositionWeight = 1f;

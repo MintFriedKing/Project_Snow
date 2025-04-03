@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PS
 {
     public class ShieldBar : HealthBar
     {
+        public Slider easeShieldSlider;
+        public Slider shieldSlier;
         public float currentShield;
         public float maxShield;
         protected override void LateUpdate()
@@ -18,7 +21,7 @@ namespace PS
         }
         public override void SetHealthBar(float _percentage)
         {
-            base.SetHealthBar(_percentage);
+            //base.SetHealthBar(_percentage);
         }
         public void TakeDamage(float _amount)
         {

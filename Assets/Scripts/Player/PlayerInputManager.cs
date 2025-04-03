@@ -44,7 +44,7 @@ public class PlayerInputManager : MonoBehaviour
 
         if (player != null && player.IsDodge == false && player.IsGround == true)
         {
-            AimDownState();
+            //AimDownState();
             KeyBordInPut();
             MouseInPut();
         }
@@ -83,6 +83,8 @@ public class PlayerInputManager : MonoBehaviour
                  && player.IsDodge == false && 
                 player.IsGround == true && player.IsDash == false)
             {
+                UIManager.Instance.steminaSlider.gameObject.SetActive(true);
+           
                 player.DashIn();
             }
         }
@@ -91,6 +93,15 @@ public class PlayerInputManager : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
+            if (GameManager.Instance.CurrentPlayer.CurrentStemina > 0)
+            {
+                UIManager.Instance.steminaSlider.gameObject.SetActive(true);
+
+            }
+            else
+            {
+                UIManager.Instance.steminaSlider.gameObject.SetActive(false);
+            }
             player.DashOut();
         }
     }

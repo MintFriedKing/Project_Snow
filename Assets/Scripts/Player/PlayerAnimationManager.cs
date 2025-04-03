@@ -109,9 +109,9 @@ public class PlayerAnimationManager : MonoBehaviour
         playerAnimator.SetBool("IsGround",_isGround);
        
     }
-    public void Dash()
+    public void Dash(bool _isDash)
     {
-        playerAnimator.SetTrigger("Dash");
+        playerAnimator.SetBool("IsDash", _isDash);
     }
     public void Combat(bool _isCombat)
     {

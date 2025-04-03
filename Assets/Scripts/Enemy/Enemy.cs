@@ -193,6 +193,7 @@ public class Enemy : MonoBehaviour
             {
                 //try
                 //{
+                
                 if (colider.gameObject.GetComponent<Enemy>() == null)
                 {
                     colider.gameObject.GetComponentInParent<Enemy>().isHeardRoar = true;
