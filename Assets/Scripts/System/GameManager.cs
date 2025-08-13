@@ -69,6 +69,7 @@ namespace PS
         public float currentGameTime;
         private Coroutine drawPathCoroutine;
         public int SelectNumber { get { return selectNumber; } }
+        public int PreviousSlectNumber { get { return previousSlectNumber; } }
         public Player CurrentPlayer { get { return currentPlayer; } }
         public Transform CameraFollowTransform { get { return cameraFollowTransform; } }
         public Transform PlayerTransform { get { return playerTransform; } }
@@ -83,19 +84,16 @@ namespace PS
             {
                 SkillManager.Instance.SkillCoolTimes[i] = players[i].skillCoolTime;
             }
-          
-           
-
+               
         }
         private void Start()
         {
-            InvokeRepeating(nameof(DrawPath),0f,pathUpdateSpeed);
-           
+            //InvokeRepeating(nameof(DrawPath),0f,pathUpdateSpeed);
+            DrawPath();
         }
         public void Update()
         {
            
-
             if (currentGameTime > 0)
             {
                 currentGameTime -= Time.deltaTime;
@@ -115,21 +113,21 @@ namespace PS
                    
                     previousSlectNumber = selectNumber;
                     selectNumber = 1;
-                    CharacterSelect(selectNumber);
+                    SelectCharacter(selectNumber);
                 }
                 else if (Input.GetKeyDown(KeyCode.Alpha2)
                     && GameManager.Instance.players[1].player.playerState != Player.PlayerState.DIE)
                 {
                     previousSlectNumber = selectNumber;
                     selectNumber = 2;
-                    CharacterSelect(selectNumber);
+                    SelectCharacter(selectNumber);
                 }
                 else if (Input.GetKeyDown(KeyCode.Alpha3)
                     && GameManager.Instance.players[2].player.playerState != Player.PlayerState.DIE)
                 {
                     previousSlectNumber = selectNumber;
                     selectNumber = 3;
-                    CharacterSelect(selectNumber);
+                    SelectCharacter(selectNumber);
                 }
             }
         }
@@ -146,63 +144,52 @@ namespace PS
                 PlayerInformation.stamina = PlayerInformation.player.MaxStemina; //달릴때 쓰는 스테미나 
             }
          
-            CharacterSelect(selectNumber);
+            SelectCharacter(selectNumber);
             players[selectNumber - 1].player.gameObject.SetActive(true);
             currentPlayer = players[selectNumber - 1].player;
             playerInputManager.player = currentPlayer;
         }
-        private void CharacterSwap(int _selectNumber)
-        {
-         
-            if (previousSlectNumber == _selectNumber) // 이전 과 지금이 같은가? 
+        private void SwapCharacter(int _selectNumber)
+        {       
+            if (previousSlectNumber == _selectNumber)
             {        
                 return;             
             }
             else
             {
-                previousTransform = players[previousSlectNumber - 1].player.transform; //이전 캐릭터의 위치를 대입하고
-                currentTransform = previousTransform; //현재에 적용
-         
+                previousTransform = players[previousSlectNumber - 1].player.transform;
+                currentTransform = previousTransform;
                 previousRotation = players[previousSlectNumber - 1].player.transform.rotation;
                 currentRotation = previousRotation;
-
                 currentPlayer = players[_selectNumber - 1].player;
            
-
-                //1.다르다면 교체해야한다.
-                for (int i = 0; i < players.Count; i++) //
+                for (int i = 0; i < players.Count; i++) 
                 {
-                    if (i == (_selectNumber - 1)) //선택한 캐릭터의 경우 
+                    if (i == (_selectNumber - 1)) 
                     {
-                        //cameraController.cameraTarget = players[_selectNumber - 1].cameraTargetTransform;//카메라 목표 교체해주고                                                                                             
-                        playerInputManager.player = currentPlayer;
-                       // cameraController.playerInputManager = players[_selectNumber - 1].player.PlayerInputManager;
-                        players[_selectNumber - 1].player.gameObject.transform.position = currentTransform.position;  //위치를 정하고
-                        players[_selectNumber - 1].player.transform.rotation = currentRotation;             //회전을 정하고      
-                        players[_selectNumber - 1].player.gameObject.SetActive(true); //활성화 
+                                                                                                            
+                        playerInputManager.player = currentPlayer;                   
+                        players[_selectNumber - 1].player.gameObject.transform.position = currentTransform.position;  
+                        players[_selectNumber - 1].player.transform.rotation = currentRotation;                
+                        players[_selectNumber - 1].player.gameObject.SetActive(true); 
                         swapPaticleSystem.Play();
-                        //players[_selectNumber - 1].player.PlayerAnimationManager.SetMovementAnimatorValue(Mathf.Clamp01(Mathf.Abs(playerInputManager.Dir.x)), Mathf.Clamp01(Mathf.Abs(playerInputManager.Dir.z)));
-
+                      
                     }
                     else
                     {
                         players[i].player.gameObject.SetActive(false);
-                    }
-                    //players[_selectNumber - 1].player.PlayerAnimationManager.InAir(false);
+                    }               
                 }
-            }
-
-           
+            }     
                 UIManager.Instance.playerStatusIcon.sprite = players[selectNumber - 1].playerIcon;
                 UIManager.Instance.ChangeCharacterList();
                 UIManager.Instance.ChangeSkillSprite();
                 UIManager.Instance.InitStatusBar();
             
-
         }
-        private void CharacterSelect(int _SelectNumber)
+        public void SelectCharacter(int _SelectNumber)
         {
-            CharacterSwap(_SelectNumber);
+            SwapCharacter(_SelectNumber);
         }
         public void DieCharacterSwap()
         {
@@ -213,7 +200,7 @@ namespace PS
                     if (players[i].player.playerState != Player.PlayerState.DIE)
                     {
                         selectNumber = i + 1;
-                        CharacterSelect(i + 1);
+                        SelectCharacter(i + 1);
                         break;
                     }
                 }
@@ -266,18 +253,15 @@ namespace PS
                 yield return wait;
             }     
         }
+
+        public GuideTrail trail;
         private void DrawPath()
         {
             if (startPathPointnavMeshAgent == null || endPathPointTransform == null || linePath == null)
-            {
-                Debug.Log("null오류");
+            {          
                 return;
-            }
-            Debug.Log("null오류 아님");
-
+            }  
             NavMeshHit hit;
-         
-
             // End 위치 확인 및 보정
             if (NavMesh.SamplePosition(endPathPointTransform.position, out hit, 1.0f, NavMesh.AllAreas))
             {
@@ -310,6 +294,8 @@ namespace PS
                 Debug.LogError($"End Position: {endPathPointTransform.position}");
 
             }
+
+            trail.Setting();
         }
 
     }

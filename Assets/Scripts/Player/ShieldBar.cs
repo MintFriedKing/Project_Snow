@@ -30,7 +30,9 @@ namespace PS
             if (currentShield <= 0.0f)
             {
                 //this.gameObject.SetActive(false);
-                SkillManager.Instance.IsShield = false;
+               
+                SkillManager.Instance.isHasShiled = false;
+
             }      
         }
 

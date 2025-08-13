@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEngine.EventSystems.EventTrigger;
 
 [Serializable]
 public class EnemyInfo
@@ -41,8 +42,10 @@ public class Enemy : MonoBehaviour
     protected SkinnedMeshRenderer skinnedMeshRenderer;
     private float blinkTimer;
     protected NavMeshAgent navMeshAgent;
+    [SerializeField]
     protected bool isMove;
-    protected bool isAttack;
+    [SerializeField]
+    public bool isAttack;
     protected bool isCombat;
     [SerializeField,Header("공격속도")]
     private float attackBetweenTime;
@@ -72,9 +75,10 @@ public class Enemy : MonoBehaviour
     protected float spawnVFXTime = 2f;
     [SerializeField]
     public EnemyInfo enemyInfo;
+
+    public float attackRadius;
     public EnemyAnimationManger EnemyAnimationManger { get { return enemyAnimationManger; } set { enemyAnimationManger = value; } }
     public NavMeshAgent NavMeshAgent { get { return navMeshAgent; } set { navMeshAgent = value; } }
-    //public Rigidbody MoveRigidBody { get { return moveRigidBody; } set { moveRigidBody = value; } }
     public float Damage { get { return damage; } set { damage = value; } }
     public bool IsMove { get { return isMove; } set { isMove = value; } }
     #region 하울링 기능 전역 멤버 변수 
@@ -100,12 +104,10 @@ public class Enemy : MonoBehaviour
     public EnemyState enemyState;
     private void OnEnable()
     {
-        //health.HealthBar.SetImageAlphaValue(0f, 0f);
         if (enemyInfo.weaponMeshRenderers != null)
         { 
             ChangeWeaponMaterial(enemyInfo.weaponSpawnMaterial);
         }
-       // SetIdle();
         ChangeSkinMeshMaterial(enemyInfo.spawnMaterial);
         StartCoroutine(Recall());
        
@@ -163,26 +165,66 @@ public class Enemy : MonoBehaviour
         blinkTimer -= Time.deltaTime;
         float _lerp = Mathf.Clamp01(blinkTimer / blinkDuration);
         float _intensity = (_lerp * blinkIntensity) + 1.0f;
-        //skinnedMeshRenderer.material.color = Color.white * _intensity;
         skinnedMeshRenderer.material.color = materialColor * Color.white * _intensity;
     }
     public virtual void Attack()
     {
-        if (isAttack == true)
+        Debug.Log("공격");
+    
+        transform.LookAt(Player.Instance.transform);
+        if (SkillManager.Instance.isHasShiled == false) //쉴드 적용중이 아니면 HP를 까시고 
         {
-            leftHendColider.enabled = true;
-            rightHendColider.enabled = true;
-            isAttack = false;
-            transform.LookAt(Player.Instance.transform);
-            enemyAnimationManger.Attack();
+            Collider[] hitcoliders = Physics.OverlapSphere(this.transform.position, attackRadius);
+            foreach (Collider collider in hitcoliders)
+            {
+                Debug.Log("콜라이더 검사 진행");
+                if (collider.CompareTag("Player"))
+                {
+                    Debug.Log("플레이어 태그 검사");
+                    PlayerHealth health = collider.GetComponent<PlayerHealth>()
+                      ?? collider.GetComponentInParent<PlayerHealth>()
+                         ?? collider.GetComponentInChildren<PlayerHealth>();  //??는 앞의 값이 null이면 다음 검사로 넘어가는 연산자
+                    if (health != null)
+                    {
+                        if (health.GetComponent<Player>().IsDodge != false)
+                        {
+                            return;
+                        }
+                        health.TakeDamage(damage, Vector3.zero);
+                        break;
+                    }
+                }
 
+            }
         }
-        else
+        else 
         {
-            leftHendColider.enabled = false;
-            rightHendColider.enabled = false;
-            transform.LookAt(Player.Instance.transform);
+            Collider[] hitcoliders = Physics.OverlapSphere(this.transform.position, attackRadius);
+            foreach (Collider collider in hitcoliders)
+            {
+               
+                if (collider.CompareTag("Shield"))
+                {
+                    Debug.Log("플레이어 태그 검사");
+                    CollisonShieldInstantiate collisonShieldInstantiate = collider.GetComponent<CollisonShieldInstantiate>()
+                      ?? collider.GetComponentInParent<CollisonShieldInstantiate>()
+                         ?? collider.GetComponentInChildren<CollisonShieldInstantiate>();  //??는 앞의 값이 null이면 다음 검사로 넘어가는 연산자
+                    if (collisonShieldInstantiate != null)
+                    {
+                        collisonShieldInstantiate.OnActiveCrackObject(GameManager.Instance.PlayerInputManager.transform);
+                        UIManager.Instance.ShieldBar.TakeDamage(damage);                     
+                        break;
+                    }
+                }
+
+            }
         }
+
+    }
+    public void AttackAnimationStart()
+    {
+            enemyAnimationManger.Movement(false);
+            enemyAnimationManger.Attack();        
     }
     public virtual void RoarAlert(float _roarRange)
     {
@@ -191,9 +233,7 @@ public class Enemy : MonoBehaviour
         {
             if (colider.gameObject.tag == "Enemy")
             {
-                //try
-                //{
-                
+                      
                 if (colider.gameObject.GetComponent<Enemy>() == null)
                 {
                     colider.gameObject.GetComponentInParent<Enemy>().isHeardRoar = true;
@@ -202,13 +242,6 @@ public class Enemy : MonoBehaviour
                 {
                     colider.gameObject.GetComponent<Enemy>().isHeardRoar = true; 
                 }
-                //}
-                //catch 
-                //{
-                //    //error 나는 부분 
-                //    //colider.gameObject.GetComponentInParent<RangeEnemy>().isHeardRoar = true;
-                //    Debug.Log("catch error"+ colider.transform.name);
-                //}
             }
                        
         }
@@ -239,9 +272,7 @@ public class Enemy : MonoBehaviour
         {
             Material[] newMaterials = enemyInfo.skinnedMeshRenderers[i].materials; // 기존 배열 가져오기
             for (int j = 0; j < enemyInfo.skinnedMeshRenderers[i].materials.Length; j++)
-            {
-                //newMaterials[j] = enemyInfo.spawnMaterial[count].SetFloat("_SpiltValue", -0.8f);
-                //newMaterials[j] = enemyInfo.spawnMaterial[count++];
+            {               
                 newMaterials[j] = _materials[count++];
                 newMaterials[j].SetFloat("_SpiltValue", -0.8f);
             }
@@ -258,8 +289,6 @@ public class Enemy : MonoBehaviour
                 Material[] newMaterials = enemyInfo.weaponMeshRenderers[i].materials; // 기존 배열 가져오기
                 for (int j = 0; j < enemyInfo.weaponMeshRenderers[i].materials.Length; j++)
                 {
-                    //newMaterials[j] = enemyInfo.spawnMaterial[count].SetFloat("_SpiltValue", -0.8f);
-                    //newMaterials[j] = enemyInfo.spawnMaterial[count++];
                     newMaterials[j] = _materials[count++];
                     newMaterials[j].SetFloat("_SpiltValue", -0.8f);
                 }
@@ -278,7 +307,6 @@ public class Enemy : MonoBehaviour
         while (elapsedTime < _spawnSpeed)
         {
             elapsedTime += _spawnSpeed * Time.deltaTime;
-            //lerp 잘못알고있음  -> 
             float newValue = Mathf.Lerp(_startValue, _endValue, elapsedTime / _spawnSpeed);
             _material.SetFloat("_SpiltValue", newValue);
             yield return null;
@@ -331,8 +359,14 @@ public class Enemy : MonoBehaviour
             material.SetFloat("_SpiltValue", _endValue);
         }
         ChangeWeaponMaterial(_basicMaterials);
-        //BehaviorTree behaivortree = this.GetComponent<BehaviorTree>();
-        //behaivortree.enabled = true;
+      
        
     }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red; // 디버그용 빨간색 원
+        Gizmos.DrawWireSphere(transform.position, attackRadius);
+    }
+
 }

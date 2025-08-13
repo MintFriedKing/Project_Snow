@@ -18,9 +18,13 @@ namespace PS
             if (other.gameObject.CompareTag("Player"))
             {
                 boxCollider.enabled = false;
-                Vector3 direction = (other.transform.position - transform.position).normalized;
-                other.GetComponent<Player>().PlayerRigidbody.AddForce(direction * knockBackPower ,ForceMode.Impulse);
-                Debug.Log("Player 히트");
+                if (SkillManager.Instance.isHasShiled == false)
+                {
+                    Vector3 direction = (other.transform.position - transform.position).normalized;
+                    direction.y = 0f;
+                    GameManager.Instance.PlayerInputManager.GetComponent<Rigidbody>().AddForce(direction * knockBackPower, ForceMode.Impulse);
+                    Debug.Log("Player 히트");
+                }
             }
         }
     }

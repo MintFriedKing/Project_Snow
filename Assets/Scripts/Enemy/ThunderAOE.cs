@@ -15,12 +15,10 @@ namespace PS
         public override TaskStatus OnUpdate()
         {
             if (boss.CurrentDistance > minDistance && boss.CurrentDistance <= maxDistance)
-            {
-                
+            {     
                 boss.BossAnimationManger.ThunderAOE(attackNumber);
                 StartCoroutine(boss.BossVFXSpawnAbilities.ThunderAOE());        
-                return TaskStatus.Success;
-                
+                return TaskStatus.Success;   
             }
             else 
             {

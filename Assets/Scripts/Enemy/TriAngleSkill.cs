@@ -21,18 +21,6 @@ namespace PS
         private int playerCount;
         private Mesh mesh;//매쉬를 그릴거임 
 
-        private void OnEnable()
-        {
-            
-        }
-        private void OnDisable()
-        {
-            //TriangleCheck();
-        }
-        private void Start()
-        {
-            //TriangleCheck();
-        }
         void Update()
         {
            TriangleCheck();
@@ -48,13 +36,22 @@ namespace PS
             for (int i = 0; i < playerCount; ++i)
             {
                 GameObject player = colliders[i].gameObject;
-
+                
                 if (IsInSight(player) == true)
                 {
                     gameObjects.Add(player);
-                    gameObjects[i].GetComponent<Player>().PlayerHealth.TakeDamage(damage ,Vector3.zero);
-                    gameObjects[i].GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce,ForceMode.Impulse);
+                    if (SkillManager.Instance.isHasShiled == false)
+                    {
+                        GameManager.Instance.CurrentPlayer.PlayerHealth.TakeDamage(damage, Vector3.zero);
+                        GameManager.Instance.PlayerInputManager.GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                    }
+                    else
+                    {
+
+                        UIManager.Instance.ShieldBar.TakeDamage(damage); 
+                    }
                     this.enabled = false;
+                    break;
                 }
             }
         }

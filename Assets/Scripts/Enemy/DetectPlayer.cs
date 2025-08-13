@@ -15,11 +15,19 @@ namespace PS
         public float detectRadius = 3f;
         public float roarRange = 6f;
 
+        public override void OnStart()
+        {
+            if (rangeEnemy != null)
+            {
+                rangeEnemy.RangeEnemyAnimationManager.Animator.SetLayerWeight(1,1f);
+            }
+        }
 
         public override TaskStatus OnUpdate()
         {
            
             Collider[] hitColiders;
+
             if (enemy != null)
             {
                 hitColiders= Physics.OverlapSphere(enemy.transform.position, detectRadius);
@@ -36,15 +44,19 @@ namespace PS
                    
                     if (rangeEnemy != null)
                     {
-                        rangeEnemy.transform.LookAt(GameManager.Instance.PlayerTransform.position);
-                        rangeEnemy.LookAtIK.solver.target = GameManager.Instance.CameraFollowTransform;
+                        //LookAtik
+                        rangeEnemy.transform.LookAt(GameManager.Instance.PlayerInputManager.transform.position); //발견시 처다보고
+                        rangeEnemy.LookAtIK.solver.target = GameManager.Instance.CameraFollowTransform; //플레이어를 처다보며
                         rangeEnemy.LookAtIK.solver.Update();
-                        rangeEnemy.AimIK.solver.target = GameManager.Instance.CameraFollowTransform;
-                        rangeEnemy.AimIK.solver.Update();
-                        rangeEnemy.aimTarget = _hitColider.transform;
-                        rangeEnemy.transform.LookAt(GameManager.Instance.PlayerTransform.position);
-                        rangeEnemy.RangeEnemyAnimationManager.Roar();
-                        rangeEnemy.RoarAlert(roarRange);
+                        //AimIk
+                        rangeEnemy.AimIK.solver.target = GameManager.Instance.CameraFollowTransform; // 플레이어를 타켓으로 설정한다.
+                        rangeEnemy.AimIK.solver.Update();   // 솔버설정을 업데이트 
+                        rangeEnemy.aimTarget = _hitColider.transform; //마찬가지로 에임을 결정한다.
+                        rangeEnemy.transform.LookAt(GameManager.Instance.PlayerTransform.position); //플레이어 방향으로 축을 튼다.
+                        //FullbodyIk
+                        rangeEnemy.FullBodyBipedIK.solver.leftHandEffector.positionWeight = 0f;
+                        rangeEnemy.RangeEnemyAnimationManager.Roar();  //울부짖는 애니메이션
+                        rangeEnemy.RoarAlert(roarRange);  // 동료를 부른다.
                     }
                   
                     if (enemy != null)
@@ -53,10 +65,7 @@ namespace PS
                         enemy.EnemyAnimationManger.Roar();
                         enemy.RoarAlert(roarRange);
                     }
-               
-                    Debug.Log("찾음");
-                
-                        
+                                              
                     return TaskStatus.Success;
                 }
             }

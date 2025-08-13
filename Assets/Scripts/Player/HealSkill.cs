@@ -28,17 +28,17 @@ namespace PS
         }
         public IEnumerator UseSkillAnimationSycnc()
         {
-            SkillManager.Instance.IsHealing = true;
+            SkillManager.Instance.IsHealing = true;        
             //애니메이션을 실행하기전에 총에 고정된 ik를 풀어준다.
             fullBodyBipedIK.solver.leftHandEffector.positionWeight = 0.0f;
             PlayerState previousPlayerState = player.playerState;
             if (previousPlayerState == PlayerState.COMBAT)
             {
-                player.playerState = Player.PlayerState.IDLE;
+                Debug.Log(
+                "player.playerState:"+player.playerState);
+                 player.playerState = PlayerState.IDLE;                
             }
-
             playerAnimationManager.Heal();
-
             while (playerAnimationManager.PlayerAnimator.GetCurrentAnimatorStateInfo(1).IsName("HealSkill") == false)
             {
                 yield return null;
@@ -49,14 +49,17 @@ namespace PS
             }
 
             fullBodyBipedIK.solver.leftHandEffector.positionWeight = 1.0f;
-
             GameObject healArea = Instantiate(skillPrefab);
             healArea.transform.position = this.transform.position;
             Destroy(healArea, healTime);
             SkillManager.Instance.IsHealing = false;
+            SkillManager.Instance.isCasting = false;
+            player.PlayerAnimationManager.PlayerAnimator.SetBool("IsCasting",false);
             if (previousPlayerState == PlayerState.COMBAT)
             {
-                player.playerState = Player.PlayerState.COMBAT;
+                Debug.Log("player.playerState:" + player.playerState);
+                player.PlayerAnimationManager.Combat(true);
+              
             }
 
         }

@@ -30,5 +30,10 @@ namespace PS
                 animator.SetTrigger("Jump");
             }
         }
+        public void Die()
+        {
+            animator.SetTrigger("Die");
+        }
+
     }
 }

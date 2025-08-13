@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 using static RootMotion.FinalIK.RagdollUtility;
 
 namespace PS
@@ -27,7 +28,7 @@ namespace PS
         private float maxDistance = 15f;
         private Vector3 targetDirection;
         private Vector3 destination;
-        //public List<Skill> skillList;
+        
         [SerializeField]
         private bool isGround;
         private Vector3 spherPos;
@@ -38,6 +39,7 @@ namespace PS
         public LayerMask groundMask;
         public Rigidbody rigidBody;
         public LookAtController lookAtController;
+        public NavMeshAgent navMeshAgent;
         public BossVFXSpawnAbilities BossVFXSpawnAbilities { get { return bossVFXSpawnAbilities; } }
         public BossAnimationManger BossAnimationManger { get { return bossAnimationManger; } }
         public TriAngleSkill TriAngleSkill { get { return triAngleSkill; } set { triAngleSkill = value; } }
@@ -105,7 +107,6 @@ namespace PS
         public void DrawTelegraph(int _selectNumber)
         {
             bossVFXSpawnAbilities.VFXSelecter(_selectNumber);// 해당 넘버의 스킬을 선택 
-
             RaycastHit hit;
             Ray ray = new Ray(transform.position, targetDirection); //나와 플레이어의 위치로 쏜다
             switch (_selectNumber)
@@ -123,10 +124,10 @@ namespace PS
                     break;
                 case 4:
                     if (Physics.Raycast(ray, out hit, 10000))
-                    {
-                        Player player = Player.Instance;
+                    {                  
+                        Transform playerTransform = GameManager.Instance.PlayerInputManager.transform;
                         destination = hit.point; //목표 방향 설정
-                        bossVFXSpawnAbilities.vfxMarker.transform.position = player.transform.position;
+                        bossVFXSpawnAbilities.vfxMarker.transform.position = playerTransform.position;
                         RotateToDestination(this.gameObject, destination, true);
                         RotateToDestination(bossVFXSpawnAbilities.vfxMarker, destination, true);
                     }
@@ -172,25 +173,14 @@ namespace PS
         {
             bossAnimationManger.Jump();
             isJumping = true;
-             rigidBody.useGravity = false;// 리지드바디 안쓸거면 중력 끄기
+             rigidBody.useGravity = false;
             timeElapsed = 0f;    
             startY = transform.position.y;
             trajectoryPoints.Clear();
             startPosition = this.transform.position;
-            endPosition = Player.Instance.transform.position;
+            endPosition = GameManager.Instance.PlayerInputManager.transform.position;
             direction = (endPosition - startPosition).normalized;
         }
-        //public void LerpJumpStart()
-        //{
-        //    startPosition = this.transform.position;
-        //    endPosition = Player.Instance.transform.position;
-
-        //    float distance = Vector3.Distance(new Vector3(startPosition.x, 0, startPosition.z), new Vector3(endPosition.x, 0, endPosition.z));
-        //    jumpTime =  distance / forwardSpeed;
-        //    isJumping = true;
-        //    timeElapsed = 0f;
-
-        //}
         public void MoveInSineWave(float _jumpFrequency ,float _jumpAmplitude ,float _forwardSpeed)
         {
        
@@ -211,20 +201,6 @@ namespace PS
             }
 
         }
-        //public void LerpJump()
-        //{
-        //    timeElapsed += Time.deltaTime;
-        //    Vector3 horizontalPosition = Vector3.Lerp(startPosition ,endPosition,timeElapsed/jumpTime);
-        //    float verticalPosition = jumpHeight * 4 * (timeElapsed / jumpTime) * (1 - timeElapsed / jumpTime);
-        //    transform.position = new Vector3(horizontalPosition.x, startPosition.y + verticalPosition, horizontalPosition.z);
-
-        //    if (timeElapsed >= jumpTime)
-        //    {
-        //        isJumping = false;
-        //    }
-        //    // 점프 완료 시 멈춤
-
-        //}
 
         #endregion
         public bool CheckGround()

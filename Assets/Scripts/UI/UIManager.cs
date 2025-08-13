@@ -59,8 +59,10 @@ public class UIManager : MonoBehaviour
 
     public Canvas mainCanvas;
     public Canvas defeatCanvas;
+    public Canvas victoryCanvas; 
     public Button defeatHomeButton;
     public Button defeatAgainButton;
+    public Button victoryHomeButton;
     public ShieldBar ShieldBar { get { return shieldBar; }  set { shieldBar = value; } }
     private void Awake()
     {
@@ -135,20 +137,14 @@ public class UIManager : MonoBehaviour
         UpdateSteminaColor();
         //-----------------------------------------------------------------------
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            GameManager.Instance.CurrentPlayer.PlayerHealth.TakeDamage(10f,Vector3.zero);
-        }
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            shieldBar.TakeDamage(10f);
-        }
+     
     }
     private void Init()
     {
         Instance = this;
         mainCanvas.gameObject.SetActive(true);
         defeatCanvas.gameObject.SetActive(false);
+        victoryCanvas.gameObject.SetActive(false);
 
         nomalSkilltext.gameObject.SetActive(false);
         GameManager gameManager = GameManager.Instance;
@@ -181,6 +177,13 @@ public class UIManager : MonoBehaviour
             OnExitButton("Lobby");
         }
         );
+        victoryHomeButton.onClick.AddListener(delegate
+        {
+
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None; // 커서 잠금 해제
+            OnExitButton("Lobby");
+        });
         defeatHomeButton.onClick.AddListener(delegate
         {
             Cursor.visible = true;
@@ -200,7 +203,7 @@ public class UIManager : MonoBehaviour
         {
             Time.timeScale = 1f;
             pause.ModalWindowOut();
-            //pause.gameObject.SetActive(false);
+            
             }
         );
 
@@ -288,6 +291,7 @@ public class UIManager : MonoBehaviour
     }
     private void OnExitButton(string _sceneName)
     {
+
         Time.timeScale = 1;
         NextSceneManager.Instance.nextSceneName = _sceneName;
         SceneManager.LoadScene("Loading");
@@ -300,14 +304,14 @@ public class UIManager : MonoBehaviour
         {
             characterListUIs[i].slider.maxValue = GameManager.Instance.players[i].player.PlayerHealth.Maxhealth;
             characterListUIs[i].slider.value = GameManager.Instance.players[i].player.PlayerHealth.Maxhealth;
-            //Debug.Log(i);
+            
         }
     }
     public void UpdateCharacterList()
     {
         int number = GameManager.Instance.SelectNumber - 1;
         characterListUIs[number].slider.value =
-            GameManager.Instance.players[number].player.PlayerHealth.CurrentHealth;
+        GameManager.Instance.players[number].player.PlayerHealth.CurrentHealth;
         if (characterListUIs[number].slider.value <= 0f)
         {
             OnDieCharacterList();

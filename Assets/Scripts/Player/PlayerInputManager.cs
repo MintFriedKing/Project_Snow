@@ -36,8 +36,9 @@ public class PlayerInputManager : MonoBehaviour
     }
     private void Update()
     {
-        if (SkillManager.Instance.IsLaserCahrge == true)
+        if (SkillManager.Instance.IsLaserCahrge == true || SkillManager.Instance.IsHealing ==true)
         {
+            
             dir =Vector3.zero;
             return;
         }
@@ -63,7 +64,7 @@ public class PlayerInputManager : MonoBehaviour
     }
 
     #region 회피 입력
-    private void Doge()
+    private void Input_Doge()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -75,7 +76,7 @@ public class PlayerInputManager : MonoBehaviour
     }
     #endregion 
     #region 달리기 입력
-    private void Dash()
+    private void Input_Dash()
     {
         if (Input.GetKey(KeyCode.LeftShift))
         {
@@ -89,7 +90,7 @@ public class PlayerInputManager : MonoBehaviour
             }
         }
     }
-    private void DashOut()
+    private void Input_DashOut()
     {
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
@@ -133,7 +134,7 @@ public class PlayerInputManager : MonoBehaviour
     // 댓을대
     // 인풋 관련해서는 눌럿을대, 댓을대, 누르고 잇을대 를 상태를 확인한다. 만약 누르고 잇는중 (차지, 푸쉬등등 일대 유요하게 사용)
 
-    private void Skill()
+    private void Input_Skill()
     {
         if (Input.GetKeyUp(KeyCode.Q) && player.IsUseSkill ==false)
         {
@@ -157,7 +158,7 @@ public class PlayerInputManager : MonoBehaviour
             }
         }
     }
-    private void ReLoad()
+    private void Input_ReLoad()
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -191,11 +192,11 @@ public class PlayerInputManager : MonoBehaviour
       dir.x = Input.GetAxis("Horizontal"); //수평 이동 
       dir.z = Input.GetAxis("Vertical"); // 수직 이동 
       dir.Normalize(); //정규화
-      Doge(); // 회피
-      Dash(); // 대쉬
-      DashOut(); //대쉬 탈출
-      Skill();
-      ReLoad();
+      Input_Doge(); // 회피
+      Input_Dash(); // 대쉬
+      Input_DashOut(); //대쉬 탈출
+      Input_Skill();
+      Input_ReLoad();
     }
     private void MouseInPut()
     {

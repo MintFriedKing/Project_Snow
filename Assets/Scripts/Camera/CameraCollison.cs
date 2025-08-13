@@ -38,9 +38,6 @@ public class CameraCollison : MonoBehaviour
     {
         Vector3 desirdCameraPosition = transform.parent.TransformPoint(dollyDirection * maxDistance);
         RaycastHit hit;
-        //내가 지정한 위치와 대상간의 위치에 선을 교차하는 충돌체가 있을경우 true를 반환한다.
-        //이경우는 카메라와 캐릭터인듯?
-        //if(Physics.Raycast(this.transform.position, this.transform.forward , out hit,))
 
         if (Physics.Linecast(transform.parent.position, desirdCameraPosition, out hit, hitMask))
         {

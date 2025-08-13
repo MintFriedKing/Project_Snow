@@ -9,10 +9,12 @@ namespace PS
     {
         public Enemy enemy;
         public RangeEnemy rangeEnemy;
+      
         public override TaskStatus OnUpdate()
         {
             if (enemy != null)
             {
+               
                 enemy.EnemyAnimationManger.Movement(false);
                 return TaskStatus.Success;
             }
@@ -30,5 +32,9 @@ namespace PS
             }
         }
 
+
+        
     }
+ 
+
 }

@@ -19,7 +19,7 @@ namespace PS
         public bool isSpawn;
         public List<SpawnInfomation> spawnInfomations;
        
-        private void OnTriggerEnter(Collider other)
+        public virtual void OnTriggerEnter(Collider other)
         {
             if (isSpawn == false && other.gameObject.tag=="Player")
             {

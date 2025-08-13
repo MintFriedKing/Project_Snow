@@ -10,7 +10,6 @@ public class WaitForAnimationTime : Wait
     public RangeEnemy rangeEnemy;
     //기다리는 시간
     private float animationWaitDuration;
-    //이 노드가 시작한 시간을 알아야 런타임 중 무리없이 작동할수 있다.
     private float startTime;
     public override void OnStart()
     {
@@ -18,25 +17,24 @@ public class WaitForAnimationTime : Wait
         float curretTime;
         if (enemy != null)
         {
-            curretTime = enemy.EnemyAnimationManger.Animator.GetCurrentAnimatorStateInfo(0).length;
+            curretTime = enemy.EnemyAnimationManger.Animator.GetCurrentAnimatorStateInfo(0).length; 
         }
         else
-        {
-            
-            curretTime = rangeEnemy.RangeEnemyAnimationManager.Animator.GetCurrentAnimatorStateInfo(0).length;
+        { 
+            curretTime = rangeEnemy.RangeEnemyAnimationManager.Animator.GetCurrentAnimatorStateInfo(0).length; 
         }
         waitTime = curretTime;
-        animationWaitDuration = waitTime.Value;
+        animationWaitDuration = waitTime.Value; //애니메이션 시간 
    
     }
     public override TaskStatus OnUpdate()
     {
-        if(startTime + animationWaitDuration <Time.time)
+        if (startTime + animationWaitDuration < Time.time)
         {
             Debug.Log("애니메이션 웨이팅 성공");
-            if (rangeEnemy != null)
+            if (rangeEnemy != null)  //원거리 적일경우에는 
             {
-                rangeEnemy.RangeEnemyAnimationManager.Animator.SetBool("IsMove",true);
+                rangeEnemy.RangeEnemyAnimationManager.Movement(0f);
             }
             return TaskStatus.Success;
         }

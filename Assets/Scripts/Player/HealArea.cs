@@ -45,14 +45,14 @@ namespace PS
                 GameObject heal = Instantiate(healAuraPrefab);
                 heal.transform.position = other.transform.position;
                 healAuras.Add(heal);
-                players.Add(other.transform.gameObject);      // 힐 , 플레이어  같은 인덱스 번호로 연결
+                players.Add(other.transform.gameObject); 
 
-                if (activeHealOverTime.ContainsKey(other.transform.gameObject) == false) //이걸 키로하는  딕셔너리  비어있냐??
+                if (activeHealOverTime.ContainsKey(other.transform.gameObject) == false) 
                 {
                     Coroutine healCoroutine = StartCoroutine(HealofTime(other.transform.gameObject));
-                    activeHealOverTime.Add(other.transform.gameObject ,healCoroutine); // 옵젝과 힐 코루틴 연결 
-
+                    activeHealOverTime.Add(other.transform.gameObject ,healCoroutine); 
                 }
+               
             }
             if (other.gameObject.CompareTag("Enemy"))
             { 
@@ -65,10 +65,8 @@ namespace PS
                     Coroutine dealCoroutine = StartCoroutine(DealOfTime(other.transform.gameObject));
                     activeDealOverTime.Add(other.transform.gameObject, dealCoroutine);
                 }
-
          
             }
-
         }
         private void OnTriggerStay(Collider other)
         {
@@ -81,7 +79,7 @@ namespace PS
                         healAuras[i].transform.position = other.transform.position;
                        
                     }
-                }
+                }          
             }
 
             if (other.gameObject.CompareTag("Enemy"))
@@ -95,8 +93,6 @@ namespace PS
                     }
                 }
             }
-
-
         }
         private void OnTriggerExit(Collider other)
         {
@@ -110,14 +106,12 @@ namespace PS
                         healAuras.RemoveAt(i);
                          
                     }
-                }
-                //범위 벗어나면 힐멈추기
+                }    
                 if (activeHealOverTime.ContainsKey(other.transform.gameObject) ==true)
                 {
                     StopCoroutine(activeHealOverTime[other.transform.gameObject]);
                     activeHealOverTime.Remove(other.transform.gameObject);
                 }
-
             }
             if (activeDealOverTime.ContainsKey(other.transform.gameObject) == true)
             {
@@ -128,17 +122,20 @@ namespace PS
         }
 
         private IEnumerator HealofTime(GameObject gameObject)
-        { 
-            PlayerHealth playerHealth = gameObject.GetComponentInChildren<PlayerHealth>();
+        {         
             while (true)
             {
+                PlayerHealth playerHealth =GameManager.Instance.CurrentPlayer.PlayerHealth;
                 if (playerHealth != null)
                 {
                     playerHealth.CurrentHealth += healPower;
+                    UIManager.Instance.UpdateCharacterList();
+                
                 }
                 yield return new WaitForSeconds(healRate);
             }
         }
+
         private IEnumerator DealOfTime(GameObject gameObject)
         { 
             Health health = gameObject.GetComponent<Health>();

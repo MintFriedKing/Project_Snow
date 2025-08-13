@@ -55,9 +55,6 @@ public class Gun : MonoBehaviour
     }
     private void Init()
     {
-        //bulletLineRenderer = this.GetComponent<LineRenderer>();
-        //bulletLineRenderer.positionCount = 2;
-        //bulletLineRenderer.enabled = false;
 
         currentBulletSpread = 0f;
         currentAmmo = maxCapacity;
@@ -70,8 +67,7 @@ public class Gun : MonoBehaviour
         //총이 준비상태이면서, 마지막으로 발사한 시점보다 시간이 fireRate 만큼 흘르는것이 발사 조건 
         if (gunState == GunState.READY && Time.time > lastFireTime + fireRate)
         {
-            //가우스 분포 나중에 이해하면 대입해보기
-            //var xSpread = RandomUtility.GetRandomNormalDistribution()
+           
             Vector3 fireDirection = _aimTarget - fireTramsform.transform.position;
             lastFireTime = Time.time;
             Shoot(fireTramsform.position, fireDirection);
@@ -82,18 +78,6 @@ public class Gun : MonoBehaviour
             return false;
         }
     }
-    //private IEnumerator ShotEffect(Vector3 hitPosition)
-    //{
-    //    //사격 파티클 재생
-    //    Instantiate(weponFlashFX, fireTramsform);
-    //    //총알 궤적 그리기
-    //    bulletLineRenderer.SetPosition(0,fireTramsform.position); // 시작점은 총구이다.
-    //    bulletLineRenderer.SetPosition(1, hitPosition);//선에 끝은 레이 충돌한 위치다.
-    //    bulletLineRenderer.enabled =true;
-
-    //    yield return new WaitForSeconds(0.03f); // 궤적이 남는 효과를 줘야 하니까 
-    //    bulletLineRenderer.enabled = false;
-    //}
     private void Shoot(Vector3 _startPoint,Vector3 _direction)
     {
              
@@ -108,7 +92,10 @@ public class Gun : MonoBehaviour
             {
                 var hitBox = hit.collider.GetComponent<HitBox>();
                 hitBox.OnRaycastHit(this, _direction);
-        
+            }
+            else
+            {
+                Debug.Log("적말고 다른데 맞음?");
             }
         
             //레이가 충돌했을 경우 
@@ -123,8 +110,6 @@ public class Gun : MonoBehaviour
             //충돌한게 없는경우는 최대 사거리를 히트 포인트로 만듬
             hitPosition = _startPoint + _direction * range; // 
         }
-        //이펙트 효과 
-        //StartCoroutine(ShotEffect(hitPosition));
         foreach (var paritcle in muzlePaticleSystems)
         {
             paritcle.Emit(1);
@@ -165,20 +150,18 @@ public class Gun : MonoBehaviour
         {
             GameManager.Instance.CurrentPlayer.fullBodyBipedIK.solver.leftHandEffector.positionWeight = 0.0f;     
         }
-       //애니메이션 실행
+        var current_player = GameManager.Instance.CurrentPlayer;
+        current_player.ChangeReload(false);
+
+        //애니메이션 실행
         GameManager.Instance.CurrentPlayer.PlayerAnimationManager.ReLoad();
-       
-       //실행된 애니메이션으로 전환될때까지 대기
-       while (GameManager.Instance.CurrentPlayer.PlayerAnimationManager.PlayerAnimator.GetCurrentAnimatorStateInfo(1).IsName("ReLoad") == false)
-       {
-            yield return null;
-        }
-        float reloadTime = GameManager.Instance.CurrentPlayer.PlayerAnimationManager.PlayerAnimator.GetCurrentAnimatorStateInfo(1).length;
-        //실행한 애니메이션이 끝날때까지 대기 
-        while (GameManager.Instance.CurrentPlayer.PlayerAnimationManager.PlayerAnimator.GetCurrentAnimatorStateInfo(1).normalizedTime < 1.0f)
+
+        yield return new WaitUntil(() =>
         {
-            yield return null;
-        }
+            return current_player.IsReloading();
+        });
+
+        current_player.ChangeReload(false);
         GameManager.Instance.CurrentPlayer.fullBodyBipedIK.solver.leftHandEffector.positionWeight = 1.0f;
         //탄창 계산하고
         var ammoToFill = maxCapacity - currentAmmo;
@@ -191,11 +174,6 @@ public class Gun : MonoBehaviour
             GameManager.Instance.CurrentPlayer.playerState = PlayerState.COMBAT;
         }
         isReLoading = false;
-        yield return new WaitForSeconds(reloadTime);
+       // yield return new WaitForSeconds(reloadTime);
     }
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.red;
-    //    Debug.DrawLine(fireTramsform.position,transform.position + transform.forward * 50);
-    //}
 }

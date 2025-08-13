@@ -76,47 +76,19 @@ namespace PS
                 playerInputManager.XRotation = xRotationMin;
             }
 
-            //if (Player.Instance.playerState == PlayerState.COMBAT)
-            //{
-
-            //    if (playerInputManager.YRotation > yRotationMax)
-            //    {
-            //        playerInputManager.YRotation = yRotationMax;
-            //    }
-            //    else if (playerInputManager.YRotation < yRotationMin)
-            //    {
-            //        playerInputManager.YRotation = yRotationMin;
-            //    }
-            //    yRotationClamped = Mathf.Clamp(playerInputManager.YRotation, yRotationMin, yRotationMax);
-
-            //}
-            //else
-            //{
-            //    yRotationClamped =playerInputManager.YRotation;
-            //}
-
             //Clamp 최소 최댓값 설정 
             xRotationClamped = Mathf.Clamp(playerInputManager.XRotation, xRotationMin, xRotationMax);
             targetRotation = Quaternion.Euler(xRotationClamped, playerInputManager.YRotation, 0f);
-            //SetPositionAndRotation() 이 transfrom을 사용하여 수정하는것보다 최적하가 좋다는데 확인해볼것 
-            //this.transform.SetPositionAndRotation(desiredPosition, targetRotation);
+            
         }
         private void SetCameraPositionAndRotation()
         {
 
             float speed = cameraFollowSpeed * Time.deltaTime;
             desiredPosition = cameraTarget.position - targetRotation * offset + Vector3.up * height;
-            this.transform.rotation = targetRotation;
-            //if (GameManager.Instance.CurrentPlayer.PlayerShootManager.isADS == true)
-           // {
-             //   Vector3 ADS  = adsPosition.transform.position;
-               // transform.position = Vector3.MoveTowards(this.transform.position, ADS, speed);
-           // }
-            //else
-            //{
-                transform.position = Vector3.MoveTowards(transform.position, desiredPosition, speed);
-            //}
-
+            this.transform.rotation = targetRotation; 
+            transform.position = Vector3.MoveTowards(transform.position, desiredPosition, speed);
+            
         }
         private void SetCameraAimDownSight()
         {

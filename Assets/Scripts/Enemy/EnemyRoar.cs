@@ -14,10 +14,12 @@ namespace PS
         public float roarRange;
         public override void OnStart()
         {
-            playerTransform = GameManager.Instance.PlayerTransform;
+            playerTransform = GameManager.Instance.CameraFollowTransform;
+
             if (rangeEnemy != null)
             {
                 rangeEnemy.aimTarget = playerTransform;
+                rangeEnemy.RangeEnemyAnimationManager.Animator.SetLayerWeight(1,1f);
             }
         }
         public override TaskStatus OnUpdate()

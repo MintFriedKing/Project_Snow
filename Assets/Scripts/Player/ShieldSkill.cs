@@ -43,9 +43,11 @@ namespace PS
             //애니메이션이 완료되면 쉴드 생성 및 상태처리
             GameObject shield = Instantiate(skillPrefab,targetTransform.position,Quaternion.identity);//ui 이펙트 생성
             shield.transform.SetParent(targetTransform);
-            SkillManager.Instance.IsShield = false;      
+            SkillManager.Instance.IsShield = false;
+            SkillManager.Instance.isHasShiled = true;
             UIManager.Instance.ShieldBar.gameObject.SetActive(true);
             UIManager.Instance.ShieldBar.Init();   //UI 처리
+
             //원래 상태로 복기 
             if (previousPlayerState == PlayerState.COMBAT)
             {

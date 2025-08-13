@@ -85,8 +85,7 @@ public class PlayerAnimationManager : MonoBehaviour
         //horizontal 매개변수에 horizontalMovement 값을 설정하되, 애니메이션이 부드럽게 전환되도록 0.1초의 지연 시간을 둔다   
         playerAnimator.SetFloat(horizontal, snappingHorizontal, 0.1f, Time.deltaTime);
         playerAnimator.SetFloat(vertical, snappingVertical, 0.1f, Time.deltaTime);
-        //playerAnimator.SetFloat(horizontal, snappingHorizontal);
-        //playerAnimator.SetFloat(vertical, snappingVertical);
+    
 
     }
     private void Init()
@@ -127,6 +126,7 @@ public class PlayerAnimationManager : MonoBehaviour
     }
     public void Heal()
     {
+        playerAnimator.SetBool("IsCasting",true);
         playerAnimator.SetTrigger("Heal");
     }
     public void ReLoad()

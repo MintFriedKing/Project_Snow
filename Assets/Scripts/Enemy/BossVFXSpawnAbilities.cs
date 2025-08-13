@@ -162,25 +162,37 @@ namespace PS
                     if (effectToSpawn.VFXAsset[i].alternateBetweenFirePoints)
                     {
                         if (leftHand)
-                        {
-                                            
-                            projectileVFX = Instantiate(effectToSpawn.VFXAsset[i].VFXPrefab, effectToSpawn.VFXAsset[i].alternateFirePoint.position + effectToSpawn.VFXAsset[i].VFXOffset, Quaternion.identity) as GameObject;
+                        {                            
+                            projectileVFX = Instantiate(effectToSpawn.VFXAsset[i].VFXPrefab, effectToSpawn.VFXAsset[i].alternateFirePoint.position + effectToSpawn.VFXAsset[i].VFXOffset, 
+                            Quaternion.identity) as GameObject;
                         }
                         else
                         {       
                     
-                            projectileVFX = Instantiate(effectToSpawn.VFXAsset[i].VFXPrefab, effectToSpawn.VFXAsset[i].VFXFirePoint.position + effectToSpawn.VFXAsset[i].VFXOffset, Quaternion.identity) as GameObject;
+                            projectileVFX = Instantiate(effectToSpawn.VFXAsset[i].VFXPrefab, effectToSpawn.VFXAsset[i].VFXFirePoint.position + effectToSpawn.VFXAsset[i].VFXOffset, 
+                            Quaternion.identity) as GameObject;
                             
                         }
                     }
                     else 
                     {
-                        projectileVFX = Instantiate(effectToSpawn.VFXAsset[i].VFXPrefab, effectToSpawn.VFXAsset[i].VFXFirePoint.position + effectToSpawn.VFXAsset[i].VFXOffset, Quaternion.identity) as GameObject;
+                        projectileVFX = Instantiate(effectToSpawn.VFXAsset[i].VFXPrefab, effectToSpawn.VFXAsset[i].VFXFirePoint.position + effectToSpawn.VFXAsset[i].VFXOffset, 
+                        Quaternion.identity) as GameObject;
                         if (effectToSpawn.VFXAsset[i].VFXParent != null)
                         {
-                            projectileVFX.transform.SetParent(effectToSpawn.VFXAsset[i].VFXParent);
-                            projectileVFX.transform.localPosition = Vector3.zero;
-                            projectileVFX.transform.localEulerAngles = Vector3.zero;
+                            if (effectToSpawn.VFXAsset[i].VFXName == "Hammer Glow")
+                            {
+                                projectileVFX.transform.SetParent(effectToSpawn.VFXAsset[i].VFXParent);
+                                projectileVFX.transform.localPosition = Vector3.zero;
+                                projectileVFX.transform.localEulerAngles = Vector3.zero;
+                                projectileVFX.transform.localScale = Vector3.one;
+                            }
+                            else
+                            {
+                                projectileVFX.transform.SetParent(effectToSpawn.VFXAsset[i].VFXParent);
+                                projectileVFX.transform.localPosition = Vector3.zero;
+                                projectileVFX.transform.localEulerAngles = Vector3.zero;
+                            }
                         }
                     }
                     if (effectToSpawn.VFXAsset[i].rotateToDestination)
@@ -204,8 +216,7 @@ namespace PS
                                 Vector3 direction = (player.transform.position - effectToSpawn.VFXAsset[i].VFXFirePoint.position).normalized;
                                 if (player != null)
                                 {
-                                    projectileVFX.GetComponent<Rigidbody>().velocity = direction * effectToSpawn.projectileSpeed;
-                                
+                                    projectileVFX.GetComponent<Rigidbody>().velocity = direction * effectToSpawn.projectileSpeed;                               
                                 }
                                  
                             }
@@ -255,18 +266,19 @@ namespace PS
                 {
                     GameObject aoeVFX;
 
-                    yield return new WaitForSeconds(effectToSpawn.delays[i]);  //애니메이션 타이밍 맞출려는 듯? 
+                    yield return new WaitForSeconds(effectToSpawn.delays[i]);
 
                     if (effectToSpawn.VFXAsset[i].VFXFirePoint != null)
                     {
-                        Player player = Player.Instance;
+                        Transform playerTransform = GameManager.Instance.PlayerInputManager.transform;
+
                         //----- 생성
                         if (effectToSpawn.VFXAsset[i].VFXFirePoint != null)
                         {
                             // 광역기 특수 처리
                             if (effectToSpawn.VFXAsset[i].VFXName == "Thunder Storm" && currentAttack == 4)
                             {
-                                aoeVFX = Instantiate(effectToSpawn.VFXAsset[i].VFXPrefab, player.transform.position, Quaternion.identity) as GameObject;
+                                aoeVFX = Instantiate(effectToSpawn.VFXAsset[i].VFXPrefab, playerTransform.transform.position, Quaternion.identity) as GameObject;
                             }
                             else
                             {
@@ -285,22 +297,29 @@ namespace PS
                        
                         if (effectToSpawn.VFXAsset[i].VFXParent != null)
                         {
-                            aoeVFX.transform.SetParent(effectToSpawn.VFXAsset[i].VFXParent);
-                            aoeVFX.transform.localPosition = Vector3.zero;
-                            aoeVFX.transform.localEulerAngles = Vector3.zero;
+                           
+                            if (effectToSpawn.VFXAsset[i].VFXName == "Hammer Glow")
+                            {
+                                aoeVFX.transform.SetParent(effectToSpawn.VFXAsset[i].VFXParent);
+                                aoeVFX.transform.localPosition = Vector3.zero;
+                                aoeVFX.transform.localEulerAngles = Vector3.zero;
+                                aoeVFX.transform.localScale = Vector3.one;
+                            }
+                            else
+                            {
+                                aoeVFX.transform.SetParent(effectToSpawn.VFXAsset[i].VFXParent);
+                                aoeVFX.transform.localPosition = Vector3.zero;
+                                aoeVFX.transform.localEulerAngles = Vector3.zero;
+                            }
                         }
 
                         //로테이션 
                         if (effectToSpawn.VFXAsset[i].rotateToDestination == true)
                         {
                             if (effectToSpawn.VFXAsset[i].VFXName == "Hammer Punch")
-                            {
-                                //Ray newRay = new Ray(vfxMarker.transform.position, player.transform.position);
-                                //Vector3 direction = (player.transform.position - this.gameObject.transform.position).normalized;
-                                //Ray newRay = new Ray(vfxMarker.transform.position, player.transform.position);
+                            {                     
                                 Ray newRay = new Ray(vfxMarker.transform.position, vfxMarker.transform.forward);
                                 RotateToDestination(aoeVFX, newRay.GetPoint(100), effectToSpawn.rotateOnlyY);
-
                             }
                             else 
                             {
@@ -308,8 +327,6 @@ namespace PS
                                 RotateToDestination(aoeVFX, newRay.GetPoint(100), effectToSpawn.rotateOnlyY);
                             }
                         }
-
- 
                         var trails = aoeVFX.GetComponent<DetachGameObjects>();
                         if (trails != null)
                         {
@@ -320,22 +337,9 @@ namespace PS
                     }
                 }
             }
-            yield return new WaitForSeconds(effectToSpawn.cooldown); //
+            yield return new WaitForSeconds(effectToSpawn.cooldown); 
           
             attacking = false;
-
-            //for (int i = 0; i < effectToSpawn.VFXAsset.Count; i++)
-            //{
-            //    if (effectToSpawn.VFXAsset[i].alternateBetweenFirePoints)
-            //    {
-            //        if (leftHand)
-            //            leftHand = false;
-            //        else
-            //            leftHand = true;
-
-            //        break;
-            //    }
-            //}
         }
         void RotateToDestination(GameObject obj, Vector3 destination, bool onlyY)
         {

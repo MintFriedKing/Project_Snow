@@ -17,13 +17,16 @@ namespace PS
         private float[] skillCoolTimes = new float[3];
      
         public static SkillManager Instance;
+        public bool isHasShiled;
+        public bool isCasting;
         public float currnetCircleSliderValue;
         public float[] SkillCoolTimes { get { return skillCoolTimes; } set { skillCoolTimes = value; } }
         public bool IsShield { get { return isShield; } set { isShield = value;  } }
         public bool IsLaserCahrge { get { return isLaserCahrge; } set { isLaserCahrge = value; } }
         public bool IsHealing { get { return isHealing; } set { isHealing = value; } }
         private void Awake()
-        {      
+        {
+            isCasting = false;
             isShield = false;
             isLaserCahrge = false;
             isHealing = false;

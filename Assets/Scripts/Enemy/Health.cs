@@ -1,4 +1,5 @@
 using BehaviorDesigner.Runtime;
+using PS;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,7 @@ using static Enemy;
 
 public class Health : MonoBehaviour
 {
+    [SerializeField]
     private Enemy enemy;
     private RagDoll ragDoll;
     [SerializeField]
@@ -23,7 +25,7 @@ public class Health : MonoBehaviour
     {
         Init();
     }
-    private void Init()
+    protected virtual void Init()
     {
         currentHealth = maxhealth;
         enemy = this.GetComponent<Enemy>();
@@ -39,10 +41,19 @@ public class Health : MonoBehaviour
         //ragDoll.EnableRagdoll(); //레그돌 발동 
         BehaviorTree behaivortree = this.GetComponent<BehaviorTree>();
         behaivortree.enabled = false;
+        enemy.NavMeshAgent.isStopped = true;
         enemy.enemyState = EnemyState.Die;
-        enemy.EnemyAnimationManger.Die();
-        float animationTime = enemy.EnemyAnimationManger.Animator.GetCurrentAnimatorStateInfo(0).length;
-        Destroy(enemy.gameObject, animationTime); 
+        if (enemy.EnemyAnimationManger != null)
+        {
+            enemy.EnemyAnimationManger.Die();
+        }
+        else
+        {
+            RangeEnemy rangeEnemy = this.GetComponent<RangeEnemy>();
+            rangeEnemy.FullBodyBipedIK.solver.leftHandEffector.positionWeight = 0f;
+            rangeEnemy.AimIK.solver.IKPositionWeight = 0f;
+            enemy.GetComponent<RangeEnemyAnimationManager>().Die();
+        }
        
     }
     public virtual void TakeDamage(float _amount ,Vector3 _direction)
@@ -51,7 +62,9 @@ public class Health : MonoBehaviour
         {
             enemy.enemyState = EnemyState.Combat;
         }
+
         currentHealth -= _amount;
+
         healthBar.SetHealthBar(currentHealth / maxhealth);
         if (currentHealth <= 0.0f)
         {
@@ -59,7 +72,27 @@ public class Health : MonoBehaviour
         }
         enemy.BlinkTimer = enemy.blinkDuration;
     }
+    //private IEnumerator DestoryObjectRoutine()
+    //{
+    //    enemy.EnemyAnimationManger.Die();
+        
+    //    AnimatorStateInfo stateInfo = enemy.EnemyAnimationManger.Animator.GetCurrentAnimatorStateInfo(0);
 
-   
+    //    while (!enemy.EnemyAnimationManger.Animator.GetCurrentAnimatorStateInfo(0).IsName("Die"))
+    //    {
+    //        yield return null;  // 다음 프레임까지 대기
+    //    }
+
+    //    while (stateInfo.normalizedTime < 1.0f)
+    //    {
+    //        yield return null;
+    //    }
+    //    Destroy(enemy.gameObject);
+    //}
+
+    private void DestoryObject()
+    { 
+        Destroy(enemy.gameObject);
+    }
 
 }

@@ -14,18 +14,10 @@ public class PlayerShootManager : MonoBehaviour
     private Camera playerCamera;
     [Header("에임포지션"), SerializeField]
     private Vector3 aimPosition;
-    //[Header("AimIK"), SerializeField]
-    //private AimIK aimIK;
-    //[SerializeField, Header("[AimPoser]"), Tooltip("AimPoser는 방향에 따라 애니메이션 이름을 반환하는 도구라고 한다.")]
-    //private AimPoser aimPoser;
-    //private AimPoser.Pose aimPose;
-    //private AimPoser.Pose lastPose;
-    //[SerializeField, Header("Look At IK")]
-    //private LookAtIK lookAtIK;
 
     public Vector3 AimPosition { get { return aimPosition; } }
     public Transform aimTransform;
-    //public AimIK AimIK { get { return aimIK; } set { aimIK = value; } }
+
     [Header("[Will keep the aim target at a distance]"), Tooltip("너무 가까우면 조준자세가 무너질수 있어 최소한의 거리를 만듬")]
     public float minAimDistance = 0.5f;
     [Header("Time of cross-fading from pose to pose."), Tooltip("포즈 간 크로스 페이딩의 지속 시간.??")]
@@ -55,11 +47,6 @@ public class PlayerShootManager : MonoBehaviour
         playerCamera = Camera.main;
         aimState = AimState.Idle;
         isADS = false;
-        //aimIK = this.transform.GetComponent<AimIK>();
-        //aimPoser = this.GetComponent<AimPoser>();
-        //lookAtIK = this.GetComponent<LookAtIK>();
-        //aimIK.enabled = false;
-        //lookAtIK.enabled = false;
 
     }
     public void UpdateAim()
@@ -72,21 +59,13 @@ public class PlayerShootManager : MonoBehaviour
         {
             aimPosition = hit.point;
             aimTransform = hit.transform;
-            //if (Physics.Linecast(gun.fireTramsform.position, hit.point, out hit, ~excludeTargetLayer))
-            //{
-            //    aimTransform = hit.transform;
-            //    aimPosition = hit.point;
-            //    //Debug.Log(hit.transform.name);
-            //}
+         
         }
         else //사정거리 안에 아무것도 없으면
         {
             aimPosition = playerCamera.transform.position + playerCamera.transform.forward * gun.Range;
             aimTransform = hit.transform;
         }
-        //    //AimIK는Solver는Aim Ik 에셋이 목표를 향하도록 계산하는 엔진!! 
-        //    aimIK.solver.IKPosition = aimTarget.position;
-        //    aimIK.solver.IKPositionWeight = 1.0f;
     }
 
     public void Shoot() //플레이어 사격 

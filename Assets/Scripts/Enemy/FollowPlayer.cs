@@ -19,37 +19,47 @@ public class FollowPlayer : Action
     
     public override TaskStatus OnUpdate()
     {
-       
 
-        if (CheckDistance() == true)
+        if (enemy != null && enemy.enemyState == Enemy.EnemyState.Die || rangeEnemy != null && rangeEnemy.enemyState == Enemy.EnemyState.Die)
         {
+            enemy.IsMove = false;
+            enemy.GetComponent<BehaviorTree>().enabled = false;
+            return TaskStatus.Failure;
+
+        }
+
+        if (CheckDistance() == true) //사정거리 까지 옴
+        {
+            if (enemy != null)
+            {
+                enemy.IsMove = false;
+                enemy.NavMeshAgent.isStopped = true;
+            }
+            else
+            {
+                rangeEnemy.NavMeshAgent.isStopped = true;
+                rangeEnemy.IsMove = false;
+            }
             return TaskStatus.Success;
         }
-        else if (enemy != null && enemy.enemyState == Enemy.EnemyState.Die ||rangeEnemy != null &&rangeEnemy.enemyState == Enemy.EnemyState.Die)
-        {
-                enemy.IsMove = false;
-                return TaskStatus.Failure;
-                      
-        }
+
         Follow();     
         return TaskStatus.Running;
     }
     public void Follow()
     {
-        //Vector3 direction = (player.transform.position - enemy.transform.position).normalized;
-        //Rigidbody rigidbody = enemy.MoveRigidBody;
-        //rigidbody.MovePosition(enemy.transform.position + direction * speed * Time.deltaTime);
+    
         if (enemy != null)
         {
             enemy.IsMove = true;
+            enemy.NavMeshAgent.isStopped = false;
             enemy.EnemyAnimationManger.Movement(true);
-            enemy.NavMeshAgent.SetDestination(GameManager.Instance.PlayerInputManager.transform.position);
-            Debug.Log(GameManager.Instance.PlayerInputManager.transform.position);
+            enemy.NavMeshAgent.SetDestination(GameManager.Instance.PlayerInputManager.transform.position);         
             enemy.NavMeshAgent.speed = followspeed;
         }
         else if (rangeEnemy != null)
         {
-            //rangeEnemy.NavMeshAgent.velocity = Vector3.zero;
+           
             rangeEnemy.NavMeshAgent.isStopped = false;
             rangeEnemy.transform.LookAt(GameManager.Instance.PlayerInputManager.transform.position);
             rangeEnemy.LookAtIK.solver.target = GameManager.Instance.CameraFollowTransform;

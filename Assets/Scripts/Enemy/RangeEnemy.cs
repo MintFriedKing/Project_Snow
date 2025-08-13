@@ -54,6 +54,7 @@ namespace PS
         public float nextFireCheckTime;
         public float aimError = 2f;
         public float bulletSpeed = 20f;
+        public GameObject gunLaser;
         #endregion
         private void OnEnable()
         {
@@ -73,17 +74,7 @@ namespace PS
             {
                 return;
             }
-            if (Time.time >= nextFireCheckTime)
-            {
-                //1을 RPS로 나눠 발사 간격 계산
-                nextFireCheckTime = Time.time + (1f / fireRate);
-                isAttack = true;
-            }
-            //if (Time.time >= nextFireCheckTime)
-            //{
-            //    nextFireCheckTime = Time.time + fireRate;
-            //    isAttack = true;
-            //}
+         
         }
         private void LateUpdate()
         {
@@ -113,20 +104,13 @@ namespace PS
             aimIK = this.transform.GetComponent<AimIK>();
             aimPoser = this.GetComponent<AimPoser>();
             lookAtIK = this.GetComponent<LookAtIK>();
-            aimIK.enabled = false;
-            //lookAtIK.enabled = false;
+            aimIK.enabled = false;        
             fullBodyBipedIK = this.GetComponent<FullBodyBipedIK>();
-            //fullBodyBipedIK.enabled =  false;
             fullBodyBipedIK.solver.leftHandEffector.positionWeight = 0f;
          
         }
         public void SpawnInit()
-        {
-            //SetIdle();
-            //ChangeSkinMeshMaterial(enemyInfo.spawnMaterial);
-            //StartCoroutine(Recall());     
-            //StartCoroutine(weaponFadeMaterial(enemyInfo.weaponSpawnMaterial, startMaterialSpawnValue,endMaterialSpawnValue,spawnTime,enemyInfo.weaponbasicMaterial));        
-
+        {   
             if (enemyInfo.weaponMeshRenderers != null)
             {
                 ChangeWeaponMaterial(enemyInfo.weaponSpawnMaterial);
@@ -134,12 +118,10 @@ namespace PS
             SetIdle();
             ChangeSkinMeshMaterial(enemyInfo.spawnMaterial);
             StartCoroutine(Recall());
-
         }
         protected override void SetIdle()
         {
-            //BehaviorTree behaivortree = this.GetComponent<BehaviorTree>();
-            //behaivortree.enabled = false;
+         
             aimIK.solver.target = null;
             aimIK.solver.IKPositionWeight = 0;
             aimIK.solver.Update();
@@ -155,6 +137,7 @@ namespace PS
         }
         public override void Attack() //원거리 공격이라 재정의 해야함 
         {
+            Debug.Log("if문들어가기전");
         
             if (isAttack == true)
             {
@@ -170,7 +153,7 @@ namespace PS
                     paritcle.Emit(1);
 
                 }
-                isAttack = false;
+                //isAttack = false;
                 //총알 생성 및 발사 
                 GameObject bullet = Instantiate(bulletPrefab, fireTransform.position, Quaternion.identity);
                 bullet.transform.gameObject.GetComponent<Bullet>().damage = Damage;

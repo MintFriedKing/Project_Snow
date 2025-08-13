@@ -19,7 +19,7 @@ namespace PS
         public string input;
         public bool stream = false;
         public string instructions = "You are a sweet woman. Your name is Lee Joo-hee and your nationality is South Korea. We are in a very close relationship. Also, we have known each other for a long time and trust each other.";
-            //"당신은 상냥한 여성입니다.당신의 이름은 이주희이며,사용자와 서로 매우 친밀한 관계 입니다.또한 서로 오래 알고 지내 신뢰하는 관계입니다.";
+         
 
     }
     [Serializable]
@@ -71,11 +71,6 @@ namespace PS
             if (string.IsNullOrEmpty(messageInPutField.text)) return;
 
             string userMessage = messageInPutField.text;
-
-
-            // 사용자 메시지를 채팅 로그에 추가
-            //messageInPutField.text += $"You: {userMessage}\n";
-
             // 입력 필드 초기화
             messageInPutField.text = "";
 

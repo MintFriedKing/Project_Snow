@@ -31,7 +31,6 @@ public class WeaponIk : MonoBehaviour
     private void Start()
     {
         Init();
-        //this.GetComponent<PlayerShootManager>().AimPosition;
 
     }
     private void LateUpdate()
@@ -69,7 +68,6 @@ public class WeaponIk : MonoBehaviour
         {
             return;
         }
-       // Vector3 targetPostion = playershootManager.AimPosition;
        Vector3 targetPostion = GetTatgetPosition();
 
         for (int i = 0; i < iterations; i++)
@@ -85,7 +83,6 @@ public class WeaponIk : MonoBehaviour
     private Vector3 GetTatgetPosition()
     {
         Vector3 targetDirection = playershootManager.AimPosition - aimTransform.position;
-        //Vector3 targetDirection =aimTransform.position;
         Vector3 aimDirection = aimTransform.forward;
         float blendOut = 0f;
         float targetAngle = Vector3.Angle(targetDirection, aimDirection);
@@ -110,8 +107,7 @@ public class WeaponIk : MonoBehaviour
         Quaternion aimTowards = Quaternion.FromToRotation(aimDirection, targetDirection);
         Quaternion blendedRotation = Quaternion.Slerp(Quaternion.identity ,aimTowards, _weight);
         _bone.rotation = aimTowards * _bone.rotation;
-        //Debug.Log($"{_bone.name}:{_bone.rotation} ");
-
+   
     }
     public void SetAimTransform(Transform _aimTransform)
     {

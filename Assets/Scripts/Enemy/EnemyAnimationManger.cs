@@ -19,10 +19,15 @@ public class EnemyAnimationManger : MonoBehaviour
     }
     public virtual void Attack()
     {
+        animator.ResetTrigger("Attack");  // 트리거 초기화
         animator.SetTrigger("Attack");
     }
     public virtual void Die()
     {
         animator.SetTrigger("Die");
+    }
+    public virtual void Distance(float _distance)
+    {
+        animator.SetFloat("Distance", _distance);
     }
 }

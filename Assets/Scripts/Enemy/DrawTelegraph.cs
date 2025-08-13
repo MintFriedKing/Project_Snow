@@ -27,14 +27,14 @@ namespace PS
                 if (boss.isCoolTime == true)
                 {
                     boss.transform.position = new Vector3(boss.transform.position.x, 0, boss.transform.position.z);
-                    boss.DrawTelegraph(drawNumber); // 1번 스킬 드로우를 그려라                   
+                    boss.DrawTelegraph(drawNumber);                    
                 }
                 else if (boss.isCoolTime == false)
                 {
                     boss.EraseTelegraph();
                     return TaskStatus.Success;
                 }
-                return TaskStatus.Running; //무한히 계속된다.
+                return TaskStatus.Running; 
 
             }
             else

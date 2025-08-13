@@ -33,44 +33,26 @@ namespace PS
         public float minDistance;
         public float maxDistance;
         public override void OnStart()
-        {
-            //RigidBodyJump();
-            //boss.BossAnimationManger.jump();
-            //StartJump();
+        {      
             jumpCount = 0;
-            //isJumping = true;
-            //player = Player.Instance;
-            //startTime = Time.deltaTime;
-            //direction = (player.transform.position - boss.transform.position).normalized;
-
-            if(boss.CurrentDistance > minDistance && boss.CurrentDistance<= boss.MaxDistance )
+            if (boss.navMeshAgent.isOnNavMesh == true)
             {
-                boss.StartJump();
-             
-            }
-            //boss.LerpJumpStart();
+                boss.navMeshAgent.enabled = false;        
+            }    
+            if(boss.CurrentDistance > minDistance && boss.CurrentDistance <= boss.MaxDistance )
+            {
+                boss.StartJump();      
+            }     
             boss.RotateToDestination(boss.gameObject,Player.Instance.transform.position,true);
         }
         public override TaskStatus OnUpdate()
         {
-
-            //if (boss.IsGround == true && jumpCount== 0)
-            //{
-            //    jumpCount++;
-            //    //RigidBodyJump();
-
-            //}
-            if (boss.isJumping == false && boss.IsGround == true /* && jumpCount ==1*/)
+            if (boss.isJumping == false && boss.IsGround == true )
             {
                 return TaskStatus.Success;
             }
-
             boss.MoveInSineWave(jumpFrequency, jumpAmplitude , forwardSpeed);
-            //SinGraphJump();
-      
             return TaskStatus.Running;
-
-
         }
         //물리 기반 점프 
         private void RigidBodyJump()
